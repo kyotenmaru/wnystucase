@@ -122,6 +122,11 @@
     .ai-card-collapsed .ai-arrow {
         transform: rotate(-90deg);
     }
+
+    /* Force 24h look on Webkit Time Inputs */
+    input[type="time"]::-webkit-datetime-edit-ampm-field {
+        display: none;
+    }
   </style>
 </head>
 <body class="h-full bg-slate-50 overflow-hidden text-slate-800">
@@ -214,7 +219,7 @@
           </button>
           
           <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="ประวัติ/รายการเคส">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
             <span class="sidebar-text">ประวัติ/รายการเคส</span>
           </button>
 
@@ -662,6 +667,7 @@
     let currentUser = null;
     let originalCaseState = null; 
     let isSidebarOpen = true;
+    let adminUpdateInterval = null; // Declare interval variable
 
     // --- Config Data ---
     const prefixes = ['เด็กชาย', 'เด็กหญิง', 'นาย', 'นางสาว'];
@@ -1074,6 +1080,8 @@
             }
         });
 
+        if(adminUpdateInterval) clearInterval(adminUpdateInterval);
+
         document.getElementById(`view-${pageId}`).classList.remove('hidden');
         
         const activeNav = document.getElementById(`nav-${pageId}`);
@@ -1090,12 +1098,24 @@
         };
         document.getElementById('page-title').textContent = titles[pageId];
 
+        // Refresh Data on Page Switch for consistency
+        casesData = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        systemLogs = JSON.parse(localStorage.getItem(LOGS_KEY)) || [];
+        activeSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+
         if(pageId === 'dashboard') updateStats();
         if(pageId === 'cases') renderTable();
-        if(pageId === 'admin') renderAdminPanel();
+        if(pageId === 'admin') {
+            renderAdminPanel();
+            adminUpdateInterval = setInterval(renderAdminPanel, 3000); 
+        }
     }
 
     function renderAdminPanel() {
+        // Refresh data inside the loop to ensure real-time updates
+        activeSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+        systemLogs = JSON.parse(localStorage.getItem(LOGS_KEY)) || [];
+
         const sessionContainer = document.getElementById('active-sessions-list');
         const users = Object.keys(activeSessions);
         
