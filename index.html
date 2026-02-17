@@ -9,6 +9,7 @@
   <style>
     * { font-family: 'Prompt', sans-serif; }
     
+    /* Animation Utility Classes */
     .stat-card {
       transition: all 0.3s ease;
       cursor: pointer;
@@ -16,22 +17,6 @@
     .stat-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    }
-    
-    .bar-animate {
-      animation: growBar 1s ease-out forwards;
-      transform-origin: left;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .bar-animate:hover {
-      filter: brightness(1.1);
-    }
-    
-    @keyframes growBar {
-      from { transform: scaleX(0); }
-      to { transform: scaleX(1); }
     }
     
     @keyframes fadeInUp {
@@ -45,528 +30,762 @@
     }
     
     .fade-in { animation: fadeInUp 0.5s ease-out forwards; }
-    .fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
-    .fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
-    .fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
     
-    .table-row:hover {
-      background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
-    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    .login-container { animation: slideInLeft 0.6s ease-out; }
-    .clock-display { font-variant-numeric: tabular-nums; letter-spacing: 0.1em; }
     .login-input:focus { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-    .login-btn { transition: all 0.3s ease; }
-    .login-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
-    }
-    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .error-message { animation: slideInLeft 0.3s ease-out; }
-    .login-logo { animation: fadeInUp 0.8s ease-out 0.2s backwards; }
-    .login-form { animation: fadeInUp 0.8s ease-out 0.4s backwards; }
-    .nav-item { transition: all 0.3s ease; }
+    .nav-item { transition: all 0.2s ease; }
     .nav-item.active {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-left: 4px solid white;
+      background: rgba(255, 255, 255, 0.15);
+      border-left: 4px solid #fff;
     }
-    .form-input { transition: all 0.3s ease; }
-    .form-input:focus { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-    .toast-message { animation: slideInUp 0.3s ease-out; }
-
-    @keyframes slideInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .form-input { transition: all 0.2s ease; }
+    .form-input:focus { 
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); 
     }
-
-    .related-student-row { animation: fadeInUp 0.3s ease-out; }
-    .modal-backdrop { animation: fadeInUp 0.3s ease-out; }
   </style>
 </head>
-<body class="h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 overflow-auto">
+<body class="h-full bg-slate-50 overflow-hidden text-slate-800">
   <div id="app" class="w-full h-full flex flex-col">
     
-    <div id="login-page" class="w-full h-full flex items-center justify-center px-4">
-      <div class="login-container max-w-md w-full">
-        <div class="login-logo text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30">
-            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-            </svg>
+    <!-- ================= LOGIN PAGE ================= -->
+    <div id="login-page" class="w-full h-full flex items-center justify-center px-4 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
+      <div class="max-w-md w-full animate-[slideInLeft_0.5s_ease-out]">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30 shadow-xl">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           </div>
-          <h1 class="text-3xl font-bold text-white mb-2">ระบบสถิติพฤติกรรม</h1>
-          <p class="text-indigo-200 text-sm">ระบบจัดการข้อมูลนักเรียน</p>
+          <h1 class="text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบดูแลนักเรียน</h1>
+          <p class="text-indigo-100 text-sm font-light">Student Behavior Management System</p>
         </div>
 
-        <div class="login-form bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
-          <form id="login-form" onsubmit="handleLogin(event)">
-            <div class="mb-6">
-              <label for="username" class="block text-sm font-semibold text-slate-700 mb-2">ชื่อผู้ใช้</label>
-              <input type="text" id="username" placeholder="กรอกชื่อผู้ใช้" required class="login-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors">
+        <!-- Form -->
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/50">
+          <form onsubmit="handleLogin(event)">
+            <div class="mb-5">
+              <label class="block text-sm font-semibold text-slate-700 mb-2">ชื่อผู้ใช้งาน</label>
+              <input type="text" id="username" value="admin" class="login-input w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none transition-colors bg-slate-50 focus:bg-white" placeholder="Username">
             </div>
             <div class="mb-6">
-              <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">รหัสผ่าน</label>
-              <input type="password" id="password" placeholder="กรอกรหัสผ่าน" required class="login-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors">
+              <label class="block text-sm font-semibold text-slate-700 mb-2">รหัสผ่าน</label>
+              <input type="password" id="password" value="1234" class="login-input w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none transition-colors bg-slate-50 focus:bg-white" placeholder="Password">
             </div>
 
-            <div id="error-message" class="hidden error-message mb-4 p-4 bg-rose-100 border-l-4 border-rose-500 rounded">
-              <p class="text-rose-700 text-sm font-medium">🚫 <span id="error-text"></span></p>
+            <div id="login-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 text-sm rounded-lg flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
             </div>
 
-            <button type="submit" id="login-btn" class="login-btn w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all">เข้าสู่ระบบ</button>
+            <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95">เข้าสู่ระบบ</button>
           </form>
-
-          <div class="mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-            <p class="text-indigo-700 text-xs font-medium mb-2">💡 ข้อมูลสำหรับทดสอบ:</p>
-            <p class="text-indigo-600 text-xs mb-1"><strong>Username:</strong> admin</p>
-            <p class="text-indigo-600 text-xs"><strong>Password:</strong> 1234</p>
+          
+          <div class="mt-6 text-center">
+            <p class="text-xs text-slate-400">Demo: admin / 1234 (หรือลอง teacher1 / 1234)</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="dashboard-page" class="hidden w-full flex h-full bg-slate-50">
+    <!-- ================= DASHBOARD LAYOUT ================= -->
+    <div id="dashboard-layout" class="hidden w-full h-full flex bg-slate-50">
       
-      <aside class="w-64 bg-gradient-to-b from-indigo-700 to-indigo-800 text-white shadow-xl flex flex-col">
-        <div class="p-6 border-b border-indigo-600">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <span id="profile-initial" class="text-lg font-bold">A</span>
+      <!-- Sidebar -->
+      <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
+        <!-- Sidebar Header -->
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
             </div>
             <div>
-              <p class="font-semibold text-sm" id="profile-name">Admin</p>
-              <p class="text-indigo-300 text-xs">ผู้ดูแลระบบ</p>
+                <h2 class="text-white font-bold text-lg leading-tight">StudentCare</h2>
+                <p class="text-xs text-slate-500">System v1.0</p>
             </div>
-          </div>
         </div>
 
-        <nav class="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
-          <button onclick="switchPage('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:bg-white/10 transition-colors">
-            แดชบอร์ด
+        <!-- User Profile -->
+        <div class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3">
+             <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                 AD
+             </div>
+             <div class="overflow-hidden">
+                 <p id="display-name" class="text-white text-sm font-medium truncate">Admin Teacher</p>
+                 <p id="display-role" class="text-xs text-slate-500 truncate">ฝ่ายปกครอง</p>
+             </div>
+        </div>
+
+        <!-- Menu -->
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมนูหลัก</p>
+          
+          <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            ภาพรวม (Dashboard)
           </button>
-          <button onclick="switchPage('record')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:bg-white/10 transition-colors">
+          
+          <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             บันทึกเคสใหม่
           </button>
-          <button onclick="switchPage('cases')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:bg-white/10 transition-colors">
-            รายการเคส
+          
+          <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            ประวัติ/รายการเคส
           </button>
-          <button onclick="toggleLoginHistory()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:bg-white/10 transition-colors">
-            บันทึกการเข้าสู่ระบบ
-          </button>
+
+          <!-- Admin Menu (Hidden by default) -->
+          <div id="admin-menu-section" class="hidden pt-6">
+              <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ผู้ดูแลระบบ</p>
+              <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                ตรวจสอบการใช้งาน
+              </button>
+          </div>
         </nav>
 
-        <div class="p-4 border-t border-indigo-600">
-          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors">
+        <!-- Logout -->
+        <div class="p-4 border-t border-slate-800">
+          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             ออกจากระบบ
           </button>
         </div>
       </aside>
 
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b border-slate-200 shadow-sm">
-          <div class="px-8 py-4 flex items-center justify-between">
-            <div>
-              <h1 id="page-title" class="text-2xl font-bold text-slate-800">แดชบอร์ด</h1>
-              <p id="semester-info" class="text-slate-500 text-sm">ยินดีต้อนรับ</p>
-            </div>
-            <div class="flex items-center gap-6">
-              <div class="text-right">
-                <div class="clock-display text-2xl font-bold font-mono" id="current-time">00:00:00</div>
-                <p class="text-slate-500 text-xs">เวลาปัจจุบัน</p>
+      <!-- Main Content Area -->
+      <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <!-- Topbar -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
+          <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดสรุปผล</h2>
+          <div class="flex items-center gap-4">
+              <div class="text-right hidden sm:block">
+                  <p class="text-sm font-bold text-slate-700" id="current-date">-</p>
+                  <p class="text-xs text-slate-500" id="current-time">00:00:00</p>
               </div>
-            </div>
           </div>
         </header>
 
-        <main class="flex-1 overflow-auto">
-          
-          <div id="page-dashboard" class="w-full h-full">
-            <section class="max-w-7xl mx-auto px-8 py-8">
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div onclick="filterAndViewCases('all')" class="stat-card bg-white rounded-2xl p-6 shadow-md border border-slate-100 fade-in fade-in-delay-1">
-                  <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">รวมทั้งหมด</span>
-                  </div>
-                  <p class="text-3xl font-bold text-slate-800" id="total-cases">0</p>
-                  <p class="text-slate-500 text-sm mt-1">เคสทั้งหมดในเทอมนี้</p>
-                </div>
-                <div onclick="filterAndViewCases('resolved')" class="stat-card bg-white rounded-2xl p-6 shadow-md border border-slate-100 fade-in fade-in-delay-2">
-                  <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">ดำเนินการแล้ว</span>
-                  </div>
-                  <p class="text-3xl font-bold text-slate-800" id="resolved-cases">0</p>
-                  <p class="text-slate-500 text-sm mt-1">แก้ไขเรียบร้อยแล้ว</p>
-                </div>
-                <div onclick="filterAndViewCases('pending')" class="stat-card bg-white rounded-2xl p-6 shadow-md border border-slate-100 fade-in fade-in-delay-3">
-                  <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">รอดำเนินการ</span>
-                  </div>
-                  <p class="text-3xl font-bold text-slate-800" id="pending-cases">0</p>
-                  <p class="text-slate-500 text-sm mt-1">อยู่ระหว่างติดตาม</p>
-                </div>
-              </div>
-            </section>
-
-            <section class="max-w-7xl mx-auto px-8 pb-8">
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-                  <h3 class="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">สถิติตามประเภทพฤติกรรม</h3>
-                  <div class="space-y-4" id="behavior-chart"></div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-                  <h3 class="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">สถิติตามระดับชั้น</h3>
-                  <div class="space-y-4" id="grade-chart"></div>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div id="page-record" class="w-full h-full hidden">
-            <section class="max-w-4xl mx-auto px-8 py-8">
-              <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-6">
-                  <h2 class="text-2xl font-bold">บันทึกเคสพฤติกรรมใหม่</h2>
-                </div>
-                <form id="record-form" onsubmit="handleRecordCase(event)" class="p-8 space-y-8">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-2">วันที่เกิดเหตุ</label>
-                      <input type="date" id="case-date" required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg">
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-auto bg-slate-50 p-8">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="space-y-6 animate-[fadeInUp_0.4s_ease-out]">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">เคสทั้งหมด</p>
+                            <h3 class="text-3xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors" id="stat-total">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-2">ชื่อ-นามสกุล นักเรียน</label>
-                      <input type="text" id="student-name" placeholder="กรอกชื่อนักเรียน" required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">รอดำเนินการ</p>
+                            <h3 class="text-3xl font-bold text-amber-500" id="stat-pending">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
                     </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-2">ชั้นเรียน</label>
-                      <select id="grade" required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg">
-                        <option value="">-- เลือกชั้นเรียน --</option>
-                        <option value="ม.1">ม.1</option>
-                        <option value="ม.2">ม.2</option>
-                        <option value="ม.3">ม.3</option>
-                        <option value="ม.4">ม.4</option>
-                        <option value="ม.5">ม.5</option>
-                        <option value="ม.6">ม.6</option>
-                      </select>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">แก้ไขแล้ว</p>
+                            <h3 class="text-3xl font-bold text-emerald-600" id="stat-resolved">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
                     </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-2">ห้อง</label>
-                      <input type="text" id="student-room" placeholder="เช่น 1, 2" required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg">
+                </div>
+
+                <!-- Graphs Area -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4">สถิติแยกตามพฤติกรรม</h3>
+                        <div id="chart-behavior" class="space-y-4">
+                            <!-- JS Generated Bars -->
+                            <div class="text-center text-slate-400 py-8">ไม่มีข้อมูล</div>
+                        </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">ประเภทพฤติกรรม</label>
-                    <select id="behavior-type" required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg">
-                      <option value="">-- เลือกประเภทพฤติกรรม --</option>
-                      <option value="relationship">💕 ชู้สาว/ความสัมพันธ์</option>
-                      <option value="fight">⚔️ ทะเลาะวิวาท</option>
-                      <option value="vice">🚬 อบายมุข</option>
-                      <option value="skip">🏃 หนีเรียน</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียดเหตุการณ์</label>
-                    <textarea id="detail" placeholder="อธิบายสถานการณ์..." required class="form-input w-full px-4 py-3 border-2 border-slate-200 rounded-lg resize-none" rows="5"></textarea>
-                  </div>
-
-                  <div class="flex gap-4 pt-6">
-                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg">บันทึกเคส</button>
-                    <button type="button" onclick="resetRecordForm()" class="px-6 py-3 bg-slate-200 text-slate-700 font-semibold rounded-lg">ล้างฟอร์ม</button>
-                  </div>
-                </form>
-
-                <div id="record-success" class="hidden toast-message fixed bottom-6 right-6 p-4 bg-emerald-500 text-white rounded-lg shadow-lg">
-                  <span>บันทึกเคสสำเร็จ!</span>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4">สถิติแยกตามระดับชั้น</h3>
+                        <div id="chart-grade" class="space-y-4">
+                            <!-- JS Generated Bars -->
+                            <div class="text-center text-slate-400 py-8">ไม่มีข้อมูล</div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </section>
-          </div>
+            </div>
 
-          <div id="page-cases" class="w-full h-full hidden">
-            <section class="max-w-7xl mx-auto px-8 py-8">
-              <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center gap-4">
-                  <h3 class="text-lg font-semibold text-slate-800">รายการเคส</h3>
-                  <div class="flex-1 flex gap-3 justify-end">
-                    <select id="filter-type" class="px-4 py-2 border rounded-lg text-sm"><option value="all">ทุกประเภท</option><option value="relationship">ชู้สาว/ความสัมพันธ์</option><option value="fight">ทะเลาะวิวาท</option><option value="vice">อบายมุข</option><option value="skip">หนีเรียน</option></select>
-                    <select id="filter-grade" class="px-4 py-2 border rounded-lg text-sm"><option value="all">ทุกระดับชั้น</option><option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option></select>
-                    <select id="filter-status" class="px-4 py-2 border rounded-lg text-sm"><option value="all">ทุกสถานะ</option><option value="resolved">ดำเนินการแล้ว</option><option value="pending">รอดำเนินการ</option></select>
-                  </div>
+            <!-- VIEW: RECORD FORM -->
+            <div id="view-record" class="hidden max-w-3xl mx-auto animate-[fadeInUp_0.4s_ease-out]">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            แบบฟอร์มบันทึกพฤติกรรม
+                        </h2>
+                        <p class="text-indigo-100 text-sm mt-1">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อความถูกต้องของสถิติ</p>
+                    </div>
+                    
+                    <form id="record-form" onsubmit="handleRecordSubmit(event)" class="p-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">วันที่เกิดเหตุ</label>
+                                <input type="date" id="input-date" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">เวลา (ประมาณ)</label>
+                                <input type="time" id="input-time" class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
+                            <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">ข้อมูลนักเรียน</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-6">
+                                    <label class="block text-sm font-medium text-slate-600 mb-1">ชื่อ-นามสกุล</label>
+                                    <input type="text" id="input-name" placeholder="ด.ช. รักเรียน เพียรศึกษา" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-slate-600 mb-1">ระดับชั้น</label>
+                                    <select id="input-grade" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg bg-white">
+                                        <option value="">เลือก</option>
+                                        <option value="ม.1">ม.1</option>
+                                        <option value="ม.2">ม.2</option>
+                                        <option value="ม.3">ม.3</option>
+                                        <option value="ม.4">ม.4</option>
+                                        <option value="ม.5">ม.5</option>
+                                        <option value="ม.6">ม.6</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-slate-600 mb-1">ห้อง</label>
+                                    <input type="text" id="input-room" placeholder="1" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg text-center">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">ประเภทพฤติกรรม</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="behavior" value="fight" class="peer sr-only" required>
+                                    <div class="p-3 text-center border border-slate-200 rounded-lg peer-checked:bg-rose-50 peer-checked:border-rose-500 peer-checked:text-rose-700 hover:bg-slate-50 transition-all">
+                                        <div class="text-xl mb-1">⚔️</div>
+                                        <div class="text-xs font-medium">ทะเลาะวิวาท</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="behavior" value="skip" class="peer sr-only">
+                                    <div class="p-3 text-center border border-slate-200 rounded-lg peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-700 hover:bg-slate-50 transition-all">
+                                        <div class="text-xl mb-1">🏃</div>
+                                        <div class="text-xs font-medium">หนีเรียน</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="behavior" value="vice" class="peer sr-only">
+                                    <div class="p-3 text-center border border-slate-200 rounded-lg peer-checked:bg-slate-100 peer-checked:border-slate-500 peer-checked:text-slate-700 hover:bg-slate-50 transition-all">
+                                        <div class="text-xl mb-1">🚬</div>
+                                        <div class="text-xs font-medium">อบายมุข</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="behavior" value="relationship" class="peer sr-only">
+                                    <div class="p-3 text-center border border-slate-200 rounded-lg peer-checked:bg-pink-50 peer-checked:border-pink-500 peer-checked:text-pink-700 hover:bg-slate-50 transition-all">
+                                        <div class="text-xl mb-1">💕</div>
+                                        <div class="text-xs font-medium">ชู้สาว</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียดเพิ่มเติม</label>
+                            <textarea id="input-detail" rows="4" class="form-input w-full px-4 py-3 border border-slate-200 rounded-lg resize-none" placeholder="ระบุรายละเอียดเหตุการณ์ สถานที่ หรือบุคคลที่เกี่ยวข้อง..."></textarea>
+                        </div>
+
+                        <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+                            <button type="button" onclick="resetForm()" class="px-6 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 font-medium rounded-lg transition-colors">ล้างค่า</button>
+                            <button type="submit" class="flex-1 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-indigo-200 transition-all active:scale-95">บันทึกข้อมูล</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="overflow-x-auto">
-                  <table class="w-full">
-                    <thead class="bg-slate-50 border-b border-slate-200">
-                      <tr>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">วันที่</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">นักเรียน</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">ชั้น/ห้อง</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">ประเภท</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">รายละเอียด</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">สถานะ</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">จัดการ</th>
-                      </tr>
-                    </thead>
-                    <tbody id="case-table" class="divide-y divide-slate-100"></tbody>
-                  </table>
+            </div>
+
+            <!-- VIEW: CASES LIST -->
+            <div id="view-cases" class="hidden animate-[fadeInUp_0.4s_ease-out]">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <h3 class="font-bold text-slate-800 text-lg">รายการบันทึกย้อนหลัง</h3>
+                        <div class="flex gap-2">
+                            <select id="filter-status" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="pending">รอดำเนินการ</option>
+                                <option value="resolved">แก้ไขแล้ว</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
+                                    <th class="px-6 py-4">วันที่</th>
+                                    <th class="px-6 py-4">นักเรียน</th>
+                                    <th class="px-6 py-4">ระดับชั้น</th>
+                                    <th class="px-6 py-4">พฤติกรรม</th>
+                                    <th class="px-6 py-4">สถานะ</th>
+                                    <th class="px-6 py-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cases-tbody" class="text-sm divide-y divide-slate-100">
+                                <!-- JS Generated Rows -->
+                                <tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-              </div>
-            </section>
-          </div>
-          
+            </div>
+            
+            <!-- VIEW: ADMIN MONITOR (NEW) -->
+            <div id="view-admin" class="hidden space-y-6 animate-[fadeInUp_0.4s_ease-out]">
+                
+                <!-- Active Users Panel -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                            ผู้ใช้งานที่กำลังออนไลน์ (Active Sessions)
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                         <div id="active-sessions-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                             <!-- JS Generated -->
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Login Logs Panel -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-lg">ประวัติการเข้าใช้งาน (Login Logs)</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 sticky top-0">
+                                <tr class="text-xs uppercase text-slate-500 font-semibold tracking-wider border-b border-slate-200">
+                                    <th class="px-6 py-3">เวลา</th>
+                                    <th class="px-6 py-3">ผู้ใช้งาน</th>
+                                    <th class="px-6 py-3">กิจกรรม</th>
+                                    <th class="px-6 py-3">อุปกรณ์</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody" class="text-sm divide-y divide-slate-100">
+                                <!-- JS Generated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
       </div>
-    </div>
 
-    <div id="login-history-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="modal-backdrop bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-96 overflow-hidden flex flex-col">
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 flex justify-between">
-          <h3 class="text-lg font-semibold">บันทึกการเข้าสู่ระบบ</h3>
-          <button onclick="toggleLoginHistory()">ปิด</button>
-        </div>
-        <div class="overflow-y-auto flex-1">
-          <table class="w-full"><tbody id="login-history-table"></tbody></table>
-        </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+      <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+          <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          <span id="toast-msg">บันทึกข้อมูลสำเร็จ</span>
       </div>
-    </div>
-
-    <div id="case-detail-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-auto">
-      <div class="modal-backdrop bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 flex justify-between">
-          <h3 class="text-lg font-semibold">รายละเอียดเคส</h3>
-          <button onclick="closeCaseDetail()">ปิด</button>
-        </div>
-        <div class="p-6 space-y-6 max-h-96 overflow-y-auto" id="case-detail-content"></div>
-        <div class="border-t border-slate-200 p-6 bg-slate-50 flex gap-3">
-          <button onclick="toggleCaseStatus()" id="complete-btn" class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg">ดำเนินการเสร็จสิ้น</button>
-          <button onclick="deleteCase()" class="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg">ลบ</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <script>
-    // --- ระบบจำลองฐานข้อมูลด้วย LocalStorage ---
-    let allCases = JSON.parse(localStorage.getItem('cases')) || [];
-    let loginLogs = JSON.parse(localStorage.getItem('loginLogs')) || [];
+    // --- Mock Data & LocalStorage ---
+    const DB_KEY = 'student_behavior_db';
+    const LOGS_KEY = 'system_login_logs';
+    const SESSIONS_KEY = 'active_sessions_mock';
     
-    function saveToDatabase() {
-      localStorage.setItem('cases', JSON.stringify(allCases));
-      localStorage.setItem('loginLogs', JSON.stringify(loginLogs));
-      updateStatistics();
+    let casesData = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+    let systemLogs = JSON.parse(localStorage.getItem(LOGS_KEY)) || [];
+    let activeSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+
+    // --- State Management ---
+    let currentUser = null;
+
+    // --- Utils ---
+    const showToast = (msg) => {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
     }
 
-    const behaviorTypes = [
-      { type: 'relationship', label: 'ชู้สาว/ความสัมพันธ์', emoji: '💕' },
-      { type: 'fight', label: 'ทะเลาะวิวาท', emoji: '⚔️' },
-      { type: 'vice', label: 'อบายมุข', emoji: '🚬' },
-      { type: 'skip', label: 'หนีเรียน', emoji: '🏃' }
-    ];
-    const grades = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'];
+    const formatDate = (dateStr) => {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+    }
 
-    let currentUser = null;
-    let currentCaseDetail = null;
-    let currentEditingCaseIndex = null;
+    const formatDateTime = (dateStr) => {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('th-TH');
+    }
 
-    // ระบบนาฬิกา
+    const behaviorLabels = {
+        'fight': { label: 'ทะเลาะวิวาท', color: 'text-rose-600 bg-rose-50' },
+        'skip': { label: 'หนีเรียน', color: 'text-amber-600 bg-amber-50' },
+        'vice': { label: 'อบายมุข', color: 'text-slate-600 bg-slate-100' },
+        'relationship': { label: 'ชู้สาว', color: 'text-pink-600 bg-pink-50' }
+    };
+
+    // --- Clock ---
     setInterval(() => {
-      const now = new Date();
-      document.getElementById('current-time').textContent = now.toTimeString().split(' ')[0];
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleTimeString('th-TH');
+        document.getElementById('current-date').textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
     }, 1000);
 
-    // ล็อกอิน
-    function handleLogin(event) {
-      event.preventDefault();
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+    // --- Logger ---
+    function logAction(user, action) {
+        const entry = {
+            id: Date.now(),
+            timestamp: new Date().toISOString(),
+            user: user,
+            action: action,
+            device: navigator.platform
+        };
+        systemLogs.unshift(entry); // Add to top
+        if(systemLogs.length > 100) systemLogs.pop(); // Keep last 100
+        localStorage.setItem(LOGS_KEY, JSON.stringify(systemLogs));
+    }
 
-      if (user === 'admin' && pass === '1234') {
-        currentUser = user;
-        loginLogs.push({ username: user, login_time: new Date().toLocaleString(), device_info: navigator.userAgent.substring(0,30), status: 'เข้าสู่ระบบ' });
-        saveToDatabase();
-        
-        document.getElementById('login-page').classList.add('hidden');
-        document.getElementById('dashboard-page').classList.remove('hidden');
-        initDashboard();
-      } else {
-        document.getElementById('error-message').classList.remove('hidden');
-        document.getElementById('error-text').textContent = 'รหัสผ่านไม่ถูกต้อง';
-      }
+    function updateSession(user, isActive) {
+        if(isActive) {
+            activeSessions[user] = new Date().toISOString();
+        } else {
+            delete activeSessions[user];
+        }
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(activeSessions));
+    }
+
+    // --- Login Logic ---
+    function handleLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+
+        // Allow any user with password '1234' for simulation
+        if(pass === '1234' && user.trim() !== '') {
+            currentUser = user;
+            
+            // Log & Session
+            logAction(user, 'เข้าสู่ระบบ (Login)');
+            updateSession(user, true);
+
+            // UI Updates
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('dashboard-layout').classList.remove('hidden');
+            document.getElementById('display-name').textContent = user === 'admin' ? 'Admin Teacher' : user;
+            document.getElementById('display-role').textContent = user === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : 'ครูที่ปรึกษา';
+            document.getElementById('user-avatar').textContent = user.substring(0,2).toUpperCase();
+
+            // Admin Menu Toggle
+            if(user === 'admin') {
+                document.getElementById('admin-menu-section').classList.remove('hidden');
+            } else {
+                document.getElementById('admin-menu-section').classList.add('hidden');
+            }
+
+            initDashboard();
+        } else {
+            document.getElementById('login-error').classList.remove('hidden');
+        }
     }
 
     function handleLogout() {
-      if(confirm('ออกจากระบบ?')) {
-        loginLogs.push({ username: currentUser, login_time: new Date().toLocaleString(), device_info: navigator.userAgent.substring(0,30), status: 'ออกจากระบบ' });
-        saveToDatabase();
-        location.reload();
-      }
+        if(confirm('ยืนยันการออกจากระบบ?')) {
+            if(currentUser) {
+                logAction(currentUser, 'ออกจากระบบ (Logout)');
+                updateSession(currentUser, false);
+            }
+            
+            // Reset User State
+            currentUser = null;
+
+            // Switch Views
+            document.getElementById('dashboard-layout').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+
+            // Clear Login Form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+        }
     }
 
-    function switchPage(page) {
-      ['dashboard', 'record', 'cases'].forEach(p => {
-        document.getElementById('page-' + p).classList.add('hidden');
-      });
-      document.getElementById('page-' + page).classList.remove('hidden');
-      
-      if(page === 'cases') renderCaseTable(allCases);
+    // --- Navigation ---
+    function switchPage(pageId) {
+        // Hide all views
+        ['view-dashboard', 'view-record', 'view-cases', 'view-admin'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('hidden');
+        });
+        
+        // Reset nav styles
+        ['nav-dashboard', 'nav-record', 'nav-cases', 'nav-admin'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.remove('active', 'bg-white/10', 'border-l-4');
+                el.classList.add('hover:bg-slate-800/50');
+            }
+        });
+
+        // Show selected view
+        document.getElementById(`view-${pageId}`).classList.remove('hidden');
+        
+        // Activate nav
+        const activeNav = document.getElementById(`nav-${pageId}`);
+        if(activeNav) {
+            activeNav.classList.add('active');
+            activeNav.classList.remove('hover:bg-slate-800/50');
+        }
+
+        // Update Title
+        const titles = {
+            'dashboard': 'แดชบอร์ดสรุปผล',
+            'record': 'บันทึกข้อมูลใหม่',
+            'cases': 'รายการประวัติ',
+            'admin': 'ระบบตรวจสอบ (Admin Monitor)'
+        };
+        document.getElementById('page-title').textContent = titles[pageId];
+
+        if(pageId === 'dashboard') updateStats();
+        if(pageId === 'cases') renderTable();
+        if(pageId === 'admin') renderAdminPanel();
     }
 
-    // บันทึกเคส
-    function handleRecordCase(event) {
-      event.preventDefault();
-      const newCase = {
-        case_date: document.getElementById('case-date').value,
-        student_name: document.getElementById('student-name').value,
-        grade: document.getElementById('grade').value,
-        student_room: document.getElementById('student-room').value,
-        behavior_type: document.getElementById('behavior-type').value,
-        detail: document.getElementById('detail').value,
-        case_status: 'pending'
-      };
-      
-      allCases.push(newCase);
-      saveToDatabase();
-      
-      document.getElementById('record-success').classList.remove('hidden');
-      setTimeout(() => document.getElementById('record-success').classList.add('hidden'), 2000);
-      resetRecordForm();
+    // --- Admin Panel Logic ---
+    function renderAdminPanel() {
+        // 1. Render Active Sessions
+        const sessionContainer = document.getElementById('active-sessions-list');
+        const users = Object.keys(activeSessions);
+        
+        if(users.length === 0) {
+            sessionContainer.innerHTML = '<div class="col-span-4 text-center text-slate-400 py-4">ไม่มีผู้ใช้งานออนไลน์</div>';
+        } else {
+            sessionContainer.innerHTML = users.map(u => `
+                <div class="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                        ${u.substring(0,2).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700">${u}</p>
+                        <p class="text-xs text-emerald-600 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> ออนไลน์
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 2. Render Logs
+        const logTbody = document.getElementById('logs-tbody');
+        logTbody.innerHTML = systemLogs.map(log => {
+            const isLogin = log.action.includes('Login');
+            return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="px-6 py-3 text-slate-500 font-mono text-xs">${formatDateTime(log.timestamp)}</td>
+                    <td class="px-6 py-3 font-medium text-slate-700">${log.user}</td>
+                    <td class="px-6 py-3">
+                        <span class="px-2 py-1 rounded text-xs font-bold ${isLogin ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'}">
+                            ${log.action}
+                        </span>
+                    </td>
+                    <td class="px-6 py-3 text-slate-400 text-xs">${log.device}</td>
+                </tr>
+            `;
+        }).join('');
     }
 
-    function resetRecordForm() {
-      document.getElementById('record-form').reset();
-      document.getElementById('case-date').valueAsDate = new Date();
+    // --- Form Handling ---
+    function handleRecordSubmit(e) {
+        e.preventDefault();
+        
+        // Get Radio Value
+        const behaviors = document.getElementsByName('behavior');
+        let selectedBehavior = '';
+        for(let b of behaviors) if(b.checked) selectedBehavior = b.value;
+
+        const newCase = {
+            id: Date.now(),
+            date: document.getElementById('input-date').value,
+            time: document.getElementById('input-time').value,
+            name: document.getElementById('input-name').value,
+            grade: document.getElementById('input-grade').value,
+            room: document.getElementById('input-room').value,
+            behavior: selectedBehavior,
+            detail: document.getElementById('input-detail').value,
+            status: 'pending', // pending, resolved
+            timestamp: new Date().toISOString()
+        };
+
+        casesData.unshift(newCase); // Add to top
+        localStorage.setItem(DB_KEY, JSON.stringify(casesData));
+        
+        showToast('บันทึกข้อมูลเรียบร้อยแล้ว');
+        resetForm();
     }
 
-    // แดชบอร์ดและสถิติ
-    function updateStatistics() {
-      document.getElementById('total-cases').textContent = allCases.length;
-      document.getElementById('resolved-cases').textContent = allCases.filter(c => c.case_status === 'resolved').length;
-      document.getElementById('pending-cases').textContent = allCases.filter(c => c.case_status === 'pending').length;
-      
-      renderBehaviorChart();
-      renderGradeChart();
+    function resetForm() {
+        document.getElementById('record-form').reset();
+        document.getElementById('input-date').valueAsDate = new Date();
     }
 
-    function renderBehaviorChart() {
-      const container = document.getElementById('behavior-chart');
-      container.innerHTML = behaviorTypes.map(bt => {
-        const count = allCases.filter(c => c.behavior_type === bt.type).length;
-        const width = allCases.length ? (count / allCases.length) * 100 : 0;
-        return `
-          <div class="flex items-center gap-4">
-            <div class="w-32 text-sm">${bt.emoji} ${bt.label}</div>
-            <div class="flex-1 h-6 bg-slate-100 rounded"><div class="h-full bg-indigo-500 rounded" style="width: ${width}%"></div></div>
-            <span class="text-sm font-bold">${count}</span>
-          </div>`;
-      }).join('');
+    // --- Dashboard Stats & Charts ---
+    function updateStats() {
+        // Counts
+        const total = casesData.length;
+        const pending = casesData.filter(c => c.status === 'pending').length;
+        const resolved = casesData.filter(c => c.status === 'resolved').length;
+
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-pending').innerText = pending;
+        document.getElementById('stat-resolved').innerText = resolved;
+
+        // Simple Bar Charts Rendering
+        renderSimpleChart('chart-behavior', getGroupedData('behavior'), behaviorLabels);
+        renderSimpleChart('chart-grade', getGroupedData('grade'));
     }
 
-    function renderGradeChart() {
-      const container = document.getElementById('grade-chart');
-      container.innerHTML = grades.map(g => {
-        const count = allCases.filter(c => c.grade === g).length;
-        const width = allCases.length ? (count / allCases.length) * 100 : 0;
-        return `
-          <div class="flex items-center gap-4">
-            <div class="w-12 text-sm">${g}</div>
-            <div class="flex-1 h-6 bg-slate-100 rounded"><div class="h-full bg-purple-500 rounded" style="width: ${width}%"></div></div>
-            <span class="text-sm font-bold">${count}</span>
-          </div>`;
-      }).join('');
+    function getGroupedData(key) {
+        const counts = {};
+        casesData.forEach(c => {
+            const val = c[key];
+            counts[val] = (counts[val] || 0) + 1;
+        });
+        return counts;
     }
 
-    // ตารางรายการเคส
-    function renderCaseTable(data) {
-      const tbody = document.getElementById('case-table');
-      tbody.innerHTML = data.map((item, index) => `
-        <tr class="border-b">
-          <td class="px-6 py-3 text-sm">${item.case_date}</td>
-          <td class="px-6 py-3 font-medium">${item.student_name}</td>
-          <td class="px-6 py-3 text-sm">${item.grade}/${item.student_room}</td>
-          <td class="px-6 py-3 text-sm">${behaviorTypes.find(b=>b.type===item.behavior_type)?.label || ''}</td>
-          <td class="px-6 py-3 text-sm truncate max-w-xs">${item.detail}</td>
-          <td class="px-6 py-3">${item.case_status === 'resolved' ? '✅ สำเร็จ' : '⏳ รอ'}</td>
-          <td class="px-6 py-3">
-            <button onclick="openCaseDetail(${index})" class="text-indigo-600 text-sm">รายละเอียด</button>
-          </td>
-        </tr>
-      `).join('');
+    function renderSimpleChart(containerId, data, labelsMap = null) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        const total = Object.values(data).reduce((a,b)=>a+b, 0);
+        if(total === 0) {
+            container.innerHTML = '<div class="text-center text-slate-400 py-4 text-sm">ยังไม่มีข้อมูล</div>';
+            return;
+        }
+
+        Object.entries(data).forEach(([key, value]) => {
+            const percentage = (value / total) * 100;
+            let label = key;
+            let colorClass = 'bg-indigo-500';
+
+            if(labelsMap && labelsMap[key]) {
+                label = labelsMap[key].label;
+                // Extract color just for variety (simple logic)
+                if(key === 'fight') colorClass = 'bg-rose-500';
+                if(key === 'skip') colorClass = 'bg-amber-500';
+                if(key === 'relationship') colorClass = 'bg-pink-500';
+                if(key === 'vice') colorClass = 'bg-slate-500';
+            } else {
+                // Randomish colors for grades
+                if(key.includes('1')) colorClass = 'bg-blue-400';
+                if(key.includes('2')) colorClass = 'bg-blue-500';
+                if(key.includes('3')) colorClass = 'bg-blue-600';
+                if(key.includes('4')) colorClass = 'bg-purple-400';
+                if(key.includes('5')) colorClass = 'bg-purple-500';
+                if(key.includes('6')) colorClass = 'bg-purple-600';
+            }
+
+            container.innerHTML += `
+                <div class="flex items-center gap-3 text-sm">
+                    <div class="w-20 font-medium text-slate-600 truncate">${label}</div>
+                    <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full ${colorClass} rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="w-8 text-right text-slate-500">${value}</div>
+                </div>
+            `;
+        });
     }
 
-    // ระบบกรองข้อมูล
-    function filterData() {
-      let filtered = [...allCases];
-      const t = document.getElementById('filter-type').value;
-      const g = document.getElementById('filter-grade').value;
-      const s = document.getElementById('filter-status').value;
-      
-      if(t !== 'all') filtered = filtered.filter(c => c.behavior_type === t);
-      if(g !== 'all') filtered = filtered.filter(c => c.grade === g);
-      if(s !== 'all') filtered = filtered.filter(c => c.case_status === s);
-      
-      renderCaseTable(filtered);
-    }
-    
-    document.getElementById('filter-type').addEventListener('change', filterData);
-    document.getElementById('filter-grade').addEventListener('change', filterData);
-    document.getElementById('filter-status').addEventListener('change', filterData);
+    // --- Table Rendering ---
+    function renderTable() {
+        const tbody = document.getElementById('cases-tbody');
+        const filter = document.getElementById('filter-status').value;
+        
+        let filteredData = casesData;
+        if(filter !== 'all') {
+            filteredData = casesData.filter(c => c.status === filter);
+        }
 
-    // การจัดการเคส (ดู, ลบ, เปลี่ยนสถานะ)
-    function openCaseDetail(index) {
-      currentEditingCaseIndex = index;
-      currentCaseDetail = allCases[index];
-      const c = currentCaseDetail;
-      
-      document.getElementById('case-detail-content').innerHTML = `
-        <p><strong>นักเรียน:</strong> ${c.student_name} (${c.grade}/${c.student_room})</p>
-        <p><strong>วันที่:</strong> ${c.case_date}</p>
-        <p><strong>รายละเอียด:</strong> ${c.detail}</p>
-        <p><strong>สถานะ:</strong> ${c.case_status}</p>
-      `;
-      document.getElementById('case-detail-modal').classList.remove('hidden');
-    }
+        if(filteredData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">ไม่พบข้อมูล</td></tr>';
+            return;
+        }
 
-    function closeCaseDetail() {
-      document.getElementById('case-detail-modal').classList.add('hidden');
-    }
+        tbody.innerHTML = filteredData.map(c => {
+            const bInfo = behaviorLabels[c.behavior] || { label: c.behavior, color: 'text-gray-600 bg-gray-100' };
+            const statusBadge = c.status === 'resolved' 
+                ? '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">แก้ไขแล้ว</span>'
+                : '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">รอการแก้ไข</span>';
 
-    function toggleCaseStatus() {
-      if(currentCaseDetail) {
-        currentCaseDetail.case_status = currentCaseDetail.case_status === 'resolved' ? 'pending' : 'resolved';
-        saveToDatabase();
-        closeCaseDetail();
-        if(document.getElementById('page-cases').classList.contains('hidden') === false) filterData();
-      }
+            return `
+                <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-500">${formatDate(c.date)}</td>
+                    <td class="px-6 py-4 font-medium text-slate-800">${c.name}</td>
+                    <td class="px-6 py-4 text-slate-600">${c.grade}/${c.room}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold ${bInfo.color}">${bInfo.label}</span>
+                    </td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="toggleStatus(${c.id})" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
+                            ${c.status === 'resolved' ? 'ทำเครื่องหมายว่ารอ' : 'ทำเครื่องหมายว่าเสร็จ'}
+                        </button>
+                        <button onclick="deleteCase(${c.id})" class="ml-3 text-xs font-medium text-rose-500 hover:text-rose-700">ลบ</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
-    function deleteCase() {
-      if(confirm('ลบข้อมูลนี้?')) {
-        allCases.splice(currentEditingCaseIndex, 1);
-        saveToDatabase();
-        closeCaseDetail();
-        filterData();
-      }
+    // --- Actions ---
+    function toggleStatus(id) {
+        const index = casesData.findIndex(c => c.id === id);
+        if(index !== -1) {
+            casesData[index].status = casesData[index].status === 'resolved' ? 'pending' : 'resolved';
+            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
+            renderTable();
+            showToast('อัปเดตสถานะเรียบร้อย');
+        }
     }
 
-    // ประวัติล็อกอิน
-    function toggleLoginHistory() {
-      const modal = document.getElementById('login-history-modal');
-      modal.classList.toggle('hidden');
-      if(!modal.classList.contains('hidden')) {
-        document.getElementById('login-history-table').innerHTML = loginLogs.slice().reverse().map(l => `
-          <tr class="border-b"><td class="p-3">${l.username}</td><td class="p-3">${l.login_time}</td><td class="p-3">${l.status}</td></tr>
-        `).join('');
-      }
+    function deleteCase(id) {
+        if(confirm('ต้องการลบข้อมูลนี้ใช่หรือไม่?')) {
+            casesData = casesData.filter(c => c.id !== id);
+            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
+            renderTable();
+            showToast('ลบข้อมูลเรียบร้อย');
+        }
     }
 
     function initDashboard() {
-      document.getElementById('case-date').valueAsDate = new Date();
-      updateStatistics();
+        document.getElementById('input-date').valueAsDate = new Date();
+        updateStats();
     }
   </script>
 </body>
