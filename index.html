@@ -48,6 +48,42 @@
         border-color: #6366f1;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); 
     }
+    
+    /* Modal Transition */
+    .modal-enter { opacity: 0; transform: scale(0.95); }
+    .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s ease-out; }
+    .modal-exit { opacity: 1; transform: scale(1); }
+    .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 0.2s ease-in; }
+
+    /* Sidebar Transition */
+    #main-sidebar {
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-text {
+        transition: opacity 0.2s ease, width 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .sidebar-collapsed .sidebar-text {
+        opacity: 0;
+        width: 0;
+        display: none; /* Helps with layout shift */
+    }
+    .sidebar-collapsed .nav-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .sidebar-collapsed #sidebar-header {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .sidebar-collapsed #user-profile-container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        justify-content: center;
+    }
   </style>
 </head>
 <body class="h-full bg-slate-50 overflow-hidden text-slate-800">
@@ -96,24 +132,30 @@
     <div id="dashboard-layout" class="hidden w-full h-full flex bg-slate-50">
       
       <!-- Sidebar -->
-      <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
+      <aside id="main-sidebar" class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
         <!-- Sidebar Header -->
-        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+        <div id="sidebar-header" class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                </div>
+                <div class="sidebar-text overflow-hidden">
+                    <h2 class="text-white font-bold text-lg leading-tight truncate">StudentCare</h2>
+                    <p class="text-xs text-slate-500 truncate">System v1.0</p>
+                </div>
             </div>
-            <div>
-                <h2 class="text-white font-bold text-lg leading-tight">StudentCare</h2>
-                <p class="text-xs text-slate-500">System v1.0</p>
-            </div>
+            <!-- Toggle Button -->
+            <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white p-1 rounded transition-colors sidebar-text">
+                <svg id="sidebar-toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+            </button>
         </div>
 
         <!-- User Profile -->
-        <div class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3">
-             <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+        <div id="user-profile-container" class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3 transition-all duration-300">
+             <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                  AD
              </div>
-             <div class="overflow-hidden">
+             <div class="sidebar-text overflow-hidden">
                  <p id="display-name" class="text-white text-sm font-medium truncate">Admin Teacher</p>
                  <p id="display-role" class="text-xs text-slate-500 truncate">ฝ่ายปกครอง</p>
              </div>
@@ -121,39 +163,46 @@
 
         <!-- Menu -->
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เมนูหลัก</p>
+          <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text">เมนูหลัก</p>
           
-          <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            ภาพรวม (Dashboard)
+          <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="ภาพรวม">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span class="sidebar-text">ภาพรวม (Dashboard)</span>
           </button>
           
-          <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-            บันทึกเคสใหม่
+          <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="บันทึกเคสใหม่">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            <span class="sidebar-text">บันทึกเคสใหม่</span>
           </button>
           
-          <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            ประวัติ/รายการเคส
+          <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="ประวัติ/รายการเคส">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <span class="sidebar-text">ประวัติ/รายการเคส</span>
           </button>
 
           <!-- Admin Menu (Hidden by default) -->
           <div id="admin-menu-section" class="hidden pt-6">
-              <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ผู้ดูแลระบบ</p>
-              <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                ตรวจสอบการใช้งาน
+              <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text">ผู้ดูแลระบบ</p>
+              <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50" title="ตรวจสอบการใช้งาน">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="sidebar-text">ตรวจสอบการใช้งาน</span>
               </button>
           </div>
         </nav>
 
         <!-- Logout -->
         <div class="p-4 border-t border-slate-800">
-          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            ออกจากระบบ
+          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors" title="ออกจากระบบ">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <span class="sidebar-text">ออกจากระบบ</span>
           </button>
+        </div>
+        
+        <!-- Bottom Toggle (Alternative for easier click) -->
+        <div class="p-2 flex justify-center border-t border-slate-800">
+             <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white p-1">
+                 <svg id="sidebar-toggle-icon-bottom" class="w-6 h-6 transform rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+             </button>
         </div>
       </aside>
 
@@ -164,8 +213,9 @@
           <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดสรุปผล</h2>
           <div class="flex items-center gap-4">
               <div class="text-right hidden sm:block">
-                  <p class="text-sm font-bold text-slate-700" id="current-date">-</p>
-                  <p class="text-xs text-slate-500" id="current-time">00:00:00</p>
+                  <!-- Realtime Date & Time -->
+                  <p class="text-sm font-bold text-indigo-600 mt-0.5" id="realtime-clock">กำลังโหลด...</p>
+                  <p class="text-xs text-slate-500 font-medium text-right" id="academic-info">กำลังโหลด...</p>
               </div>
           </div>
         </header>
@@ -329,8 +379,17 @@
                     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h3 class="font-bold text-slate-800 text-lg">รายการบันทึกย้อนหลัง</h3>
                         <div class="flex gap-2">
+                            <select id="filter-grade" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
+                                <option value="all">ทุกระดับชั้น</option>
+                                <option value="ม.1">ม.1</option>
+                                <option value="ม.2">ม.2</option>
+                                <option value="ม.3">ม.3</option>
+                                <option value="ม.4">ม.4</option>
+                                <option value="ม.5">ม.5</option>
+                                <option value="ม.6">ม.6</option>
+                            </select>
                             <select id="filter-status" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
-                                <option value="all">ทั้งหมด</option>
+                                <option value="all">สถานะทั้งหมด</option>
                                 <option value="pending">รอดำเนินการ</option>
                                 <option value="resolved">แก้ไขแล้ว</option>
                             </select>
@@ -350,17 +409,14 @@
                             </thead>
                             <tbody id="cases-tbody" class="text-sm divide-y divide-slate-100">
                                 <!-- JS Generated Rows -->
-                                <tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">กำลังโหลดข้อมูล...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
             
-            <!-- VIEW: ADMIN MONITOR (NEW) -->
+            <!-- VIEW: ADMIN MONITOR -->
             <div id="view-admin" class="hidden space-y-6 animate-[fadeInUp_0.4s_ease-out]">
-                
-                <!-- Active Users Panel -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="p-6 border-b border-slate-100 flex items-center justify-between">
                         <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
@@ -369,13 +425,9 @@
                         </h3>
                     </div>
                     <div class="p-6">
-                         <div id="active-sessions-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                             <!-- JS Generated -->
-                         </div>
+                         <div id="active-sessions-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
                     </div>
                 </div>
-
-                <!-- Login Logs Panel -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="p-6 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-lg">ประวัติการเข้าใช้งาน (Login Logs)</h3>
@@ -390,9 +442,7 @@
                                     <th class="px-6 py-3">อุปกรณ์</th>
                                 </tr>
                             </thead>
-                            <tbody id="logs-tbody" class="text-sm divide-y divide-slate-100">
-                                <!-- JS Generated -->
-                            </tbody>
+                            <tbody id="logs-tbody" class="text-sm divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -404,8 +454,104 @@
     </div>
   </div>
 
+  <!-- MODAL: EDIT CASE -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+      <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform scale-95 opacity-0 transition-all duration-200 flex flex-col max-h-[90vh]">
+          <!-- Header -->
+          <div class="p-6 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex justify-between items-center">
+              <div>
+                  <h3 class="text-lg font-bold text-slate-800">รายละเอียดและแก้ไขเคส</h3>
+                  <p class="text-xs text-slate-500 mt-1">สามารถแก้ไขข้อมูลและสถานะได้จากหน้านี้</p>
+              </div>
+              <button onclick="closeModalWithCheck()" class="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+          </div>
+          
+          <!-- Scrollable Body -->
+          <div class="p-6 overflow-y-auto">
+              <form id="edit-form" class="space-y-6">
+                  <div class="grid grid-cols-2 gap-4">
+                      <div>
+                          <label class="block text-xs font-bold text-slate-500 mb-1">วันที่</label>
+                          <input type="date" id="edit-date" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                      </div>
+                      <div>
+                          <label class="block text-xs font-bold text-slate-500 mb-1">เวลา</label>
+                          <input type="time" id="edit-time" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                      </div>
+                  </div>
+                  
+                  <div>
+                      <label class="block text-xs font-bold text-slate-500 mb-1">ชื่อนักเรียน</label>
+                      <input type="text" id="edit-name" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                      <div>
+                          <label class="block text-xs font-bold text-slate-500 mb-1">ระดับชั้น</label>
+                          <select id="edit-grade" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                              <option value="ม.1">ม.1</option>
+                              <option value="ม.2">ม.2</option>
+                              <option value="ม.3">ม.3</option>
+                              <option value="ม.4">ม.4</option>
+                              <option value="ม.5">ม.5</option>
+                              <option value="ม.6">ม.6</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label class="block text-xs font-bold text-slate-500 mb-1">ห้อง</label>
+                          <input type="text" id="edit-room" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                      </div>
+                  </div>
+
+                  <div>
+                      <label class="block text-xs font-bold text-slate-500 mb-1">พฤติกรรม</label>
+                      <select id="edit-behavior" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+                          <option value="fight">ทะเลาะวิวาท</option>
+                          <option value="skip">หนีเรียน</option>
+                          <option value="vice">อบายมุข</option>
+                          <option value="relationship">ชู้สาว</option>
+                      </select>
+                  </div>
+
+                  <div>
+                      <label class="block text-xs font-bold text-slate-500 mb-1">รายละเอียด</label>
+                      <textarea id="edit-detail" rows="4" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none"></textarea>
+                  </div>
+                  
+                  <!-- Hidden ID storage -->
+                  <input type="hidden" id="edit-id">
+              </form>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="p-6 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex flex-wrap items-center gap-3">
+              <!-- Save Changes -->
+              <button onclick="saveCaseChanges()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                  บันทึกการแก้ไข
+              </button>
+              
+              <!-- Delete -->
+              <button onclick="deleteCaseFromModal()" class="px-4 py-2 bg-rose-100 text-rose-600 hover:bg-rose-200 rounded-lg text-sm font-semibold transition-colors">
+                  ลบเคส
+              </button>
+
+              <!-- Toggle Status -->
+              <button onclick="toggleStatusFromModal()" id="btn-toggle-status" class="px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors">
+                  เปลี่ยนสถานะ
+              </button>
+
+              <!-- Close -->
+              <button onclick="closeModalWithCheck()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-colors">
+                  ปิด
+              </button>
+          </div>
+      </div>
+  </div>
+
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+  <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-[60]">
       <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
           <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           <span id="toast-msg">บันทึกข้อมูลสำเร็จ</span>
@@ -424,6 +570,8 @@
 
     // --- State Management ---
     let currentUser = null;
+    let originalCaseState = null; // To check for changes in modal
+    let isSidebarOpen = true;
 
     // --- Utils ---
     const showToast = (msg) => {
@@ -434,8 +582,9 @@
     }
 
     const formatDate = (dateStr) => {
+        if(!dateStr) return '-';
         const d = new Date(dateStr);
-        return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+        return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }); // Thai Year automated by locale
     }
 
     const formatDateTime = (dateStr) => {
@@ -450,12 +599,60 @@
         'relationship': { label: 'ชู้สาว', color: 'text-pink-600 bg-pink-50' }
     };
 
-    // --- Clock ---
-    setInterval(() => {
+    // --- Sidebar Logic ---
+    function toggleSidebar() {
+        isSidebarOpen = !isSidebarOpen;
+        const sidebar = document.getElementById('main-sidebar');
+        const bottomIcon = document.getElementById('sidebar-toggle-icon-bottom');
+        const headerIcon = document.getElementById('sidebar-toggle-icon');
+        
+        if (isSidebarOpen) {
+            sidebar.classList.remove('w-20', 'sidebar-collapsed');
+            sidebar.classList.add('w-72');
+            bottomIcon.classList.add('rotate-180'); // Point Left
+            if(headerIcon) headerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
+        } else {
+            sidebar.classList.remove('w-72');
+            sidebar.classList.add('w-20', 'sidebar-collapsed');
+            bottomIcon.classList.remove('rotate-180'); // Point Right
+            if(headerIcon) headerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>';
+        }
+    }
+
+    // --- Realtime Clock (Date + Time + BE) ---
+    function updateRealTime() {
         const now = new Date();
-        document.getElementById('current-time').textContent = now.toLocaleTimeString('th-TH');
-        document.getElementById('current-date').textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
-    }, 1000);
+        // Force Thai Locale string for full Date + Time
+        const datePart = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const timePart = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        document.getElementById('realtime-clock').textContent = `${datePart} เวลา ${timePart} น.`;
+
+        // Calculate Academic Year & Term
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        let term = 1;
+        let academicYear = year + 543;
+
+        if (month >= 5 && month <= 10) {
+            term = 1;
+        } else {
+            term = 2;
+            // If Jan-Apr, it's still the academic year of the previous calendar year
+            if (month >= 1 && month <= 4) {
+                academicYear = (year - 1) + 543;
+            }
+        }
+        
+        const academicInfo = document.getElementById('academic-info');
+        if(academicInfo) {
+            academicInfo.textContent = `ภาคเรียนที่ ${term} ปีการศึกษา ${academicYear}`;
+        }
+    }
+    
+    // Start Clock
+    setInterval(updateRealTime, 1000);
+    updateRealTime(); // Initial call
 
     // --- Logger ---
     function logAction(user, action) {
@@ -466,8 +663,8 @@
             action: action,
             device: navigator.platform
         };
-        systemLogs.unshift(entry); // Add to top
-        if(systemLogs.length > 100) systemLogs.pop(); // Keep last 100
+        systemLogs.unshift(entry); 
+        if(systemLogs.length > 100) systemLogs.pop();
         localStorage.setItem(LOGS_KEY, JSON.stringify(systemLogs));
     }
 
@@ -486,22 +683,17 @@
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
 
-        // Allow any user with password '1234' for simulation
         if(pass === '1234' && user.trim() !== '') {
             currentUser = user;
-            
-            // Log & Session
             logAction(user, 'เข้าสู่ระบบ (Login)');
             updateSession(user, true);
 
-            // UI Updates
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('dashboard-layout').classList.remove('hidden');
             document.getElementById('display-name').textContent = user === 'admin' ? 'Admin Teacher' : user;
             document.getElementById('display-role').textContent = user === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : 'ครูที่ปรึกษา';
             document.getElementById('user-avatar').textContent = user.substring(0,2).toUpperCase();
 
-            // Admin Menu Toggle
             if(user === 'admin') {
                 document.getElementById('admin-menu-section').classList.remove('hidden');
             } else {
@@ -520,15 +712,9 @@
                 logAction(currentUser, 'ออกจากระบบ (Logout)');
                 updateSession(currentUser, false);
             }
-            
-            // Reset User State
             currentUser = null;
-
-            // Switch Views
             document.getElementById('dashboard-layout').classList.add('hidden');
             document.getElementById('login-page').classList.remove('hidden');
-
-            // Clear Login Form
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('login-error').classList.add('hidden');
@@ -537,13 +723,11 @@
 
     // --- Navigation ---
     function switchPage(pageId) {
-        // Hide all views
         ['view-dashboard', 'view-record', 'view-cases', 'view-admin'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.classList.add('hidden');
         });
         
-        // Reset nav styles
         ['nav-dashboard', 'nav-record', 'nav-cases', 'nav-admin'].forEach(id => {
             const el = document.getElementById(id);
             if(el) {
@@ -552,17 +736,14 @@
             }
         });
 
-        // Show selected view
         document.getElementById(`view-${pageId}`).classList.remove('hidden');
         
-        // Activate nav
         const activeNav = document.getElementById(`nav-${pageId}`);
         if(activeNav) {
             activeNav.classList.add('active');
             activeNav.classList.remove('hover:bg-slate-800/50');
         }
 
-        // Update Title
         const titles = {
             'dashboard': 'แดชบอร์ดสรุปผล',
             'record': 'บันทึกข้อมูลใหม่',
@@ -578,7 +759,6 @@
 
     // --- Admin Panel Logic ---
     function renderAdminPanel() {
-        // 1. Render Active Sessions
         const sessionContainer = document.getElementById('active-sessions-list');
         const users = Object.keys(activeSessions);
         
@@ -600,7 +780,6 @@
             `).join('');
         }
 
-        // 2. Render Logs
         const logTbody = document.getElementById('logs-tbody');
         logTbody.innerHTML = systemLogs.map(log => {
             const isLogin = log.action.includes('Login');
@@ -619,11 +798,10 @@
         }).join('');
     }
 
-    // --- Form Handling ---
+    // --- Form Handling (Create) ---
     function handleRecordSubmit(e) {
         e.preventDefault();
         
-        // Get Radio Value
         const behaviors = document.getElementsByName('behavior');
         let selectedBehavior = '';
         for(let b of behaviors) if(b.checked) selectedBehavior = b.value;
@@ -637,11 +815,11 @@
             room: document.getElementById('input-room').value,
             behavior: selectedBehavior,
             detail: document.getElementById('input-detail').value,
-            status: 'pending', // pending, resolved
+            status: 'pending', 
             timestamp: new Date().toISOString()
         };
 
-        casesData.unshift(newCase); // Add to top
+        casesData.unshift(newCase);
         localStorage.setItem(DB_KEY, JSON.stringify(casesData));
         
         showToast('บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -653,9 +831,8 @@
         document.getElementById('input-date').valueAsDate = new Date();
     }
 
-    // --- Dashboard Stats & Charts ---
+    // --- Dashboard Stats ---
     function updateStats() {
-        // Counts
         const total = casesData.length;
         const pending = casesData.filter(c => c.status === 'pending').length;
         const resolved = casesData.filter(c => c.status === 'resolved').length;
@@ -664,44 +841,41 @@
         document.getElementById('stat-pending').innerText = pending;
         document.getElementById('stat-resolved').innerText = resolved;
 
-        // Simple Bar Charts Rendering
-        renderSimpleChart('chart-behavior', getGroupedData('behavior'), behaviorLabels);
-        renderSimpleChart('chart-grade', getGroupedData('grade'));
-    }
-
-    function getGroupedData(key) {
-        const counts = {};
+        const behaviorCounts = {};
+        Object.keys(behaviorLabels).forEach(k => behaviorCounts[k] = 0);
         casesData.forEach(c => {
-            const val = c[key];
-            counts[val] = (counts[val] || 0) + 1;
+            if(behaviorCounts[c.behavior] !== undefined) behaviorCounts[c.behavior]++;
+            else behaviorCounts[c.behavior] = 1; 
         });
-        return counts;
+
+        const allGrades = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'];
+        const gradeCounts = {};
+        allGrades.forEach(g => gradeCounts[g] = 0);
+        casesData.forEach(c => {
+            if(gradeCounts[c.grade] !== undefined) gradeCounts[c.grade]++;
+        });
+
+        renderSimpleChart('chart-behavior', behaviorCounts, behaviorLabels);
+        renderSimpleChart('chart-grade', gradeCounts);
     }
 
     function renderSimpleChart(containerId, data, labelsMap = null) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        
         const total = Object.values(data).reduce((a,b)=>a+b, 0);
-        if(total === 0) {
-            container.innerHTML = '<div class="text-center text-slate-400 py-4 text-sm">ยังไม่มีข้อมูล</div>';
-            return;
-        }
 
         Object.entries(data).forEach(([key, value]) => {
-            const percentage = (value / total) * 100;
+            const percentage = total === 0 ? 0 : (value / total) * 100;
             let label = key;
             let colorClass = 'bg-indigo-500';
 
             if(labelsMap && labelsMap[key]) {
                 label = labelsMap[key].label;
-                // Extract color just for variety (simple logic)
                 if(key === 'fight') colorClass = 'bg-rose-500';
                 if(key === 'skip') colorClass = 'bg-amber-500';
                 if(key === 'relationship') colorClass = 'bg-pink-500';
                 if(key === 'vice') colorClass = 'bg-slate-500';
             } else {
-                // Randomish colors for grades
                 if(key.includes('1')) colorClass = 'bg-blue-400';
                 if(key.includes('2')) colorClass = 'bg-blue-500';
                 if(key.includes('3')) colorClass = 'bg-blue-600';
@@ -722,18 +896,23 @@
         });
     }
 
-    // --- Table Rendering ---
+    // --- Table Rendering (Updated Action Button) ---
     function renderTable() {
         const tbody = document.getElementById('cases-tbody');
-        const filter = document.getElementById('filter-status').value;
+        const statusFilter = document.getElementById('filter-status').value;
+        const gradeFilter = document.getElementById('filter-grade').value;
         
         let filteredData = casesData;
-        if(filter !== 'all') {
-            filteredData = casesData.filter(c => c.status === filter);
+        
+        if(statusFilter !== 'all') {
+            filteredData = filteredData.filter(c => c.status === statusFilter);
+        }
+        if(gradeFilter !== 'all') {
+            filteredData = filteredData.filter(c => c.grade === gradeFilter);
         }
 
         if(filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">ไม่พบข้อมูล</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">ไม่พบข้อมูลตามเงื่อนไข</td></tr>';
             return;
         }
 
@@ -753,33 +932,173 @@
                     </td>
                     <td class="px-6 py-4">${statusBadge}</td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="toggleStatus(${c.id})" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline">
-                            ${c.status === 'resolved' ? 'ทำเครื่องหมายว่ารอ' : 'ทำเครื่องหมายว่าเสร็จ'}
+                        <button onclick="openCaseModal(${c.id})" class="text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
+                            รายละเอียด
                         </button>
-                        <button onclick="deleteCase(${c.id})" class="ml-3 text-xs font-medium text-rose-500 hover:text-rose-700">ลบ</button>
                     </td>
                 </tr>
             `;
         }).join('');
     }
 
-    // --- Actions ---
-    function toggleStatus(id) {
-        const index = casesData.findIndex(c => c.id === id);
-        if(index !== -1) {
-            casesData[index].status = casesData[index].status === 'resolved' ? 'pending' : 'resolved';
-            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
-            renderTable();
-            showToast('อัปเดตสถานะเรียบร้อย');
+    // --- MODAL & EDIT ACTIONS ---
+    function openCaseModal(id) {
+        const c = casesData.find(x => x.id === id);
+        if(!c) return;
+
+        // Populate Form
+        document.getElementById('edit-id').value = c.id;
+        document.getElementById('edit-date').value = c.date;
+        document.getElementById('edit-time').value = c.time;
+        document.getElementById('edit-name').value = c.name;
+        document.getElementById('edit-grade').value = c.grade;
+        document.getElementById('edit-room').value = c.room;
+        document.getElementById('edit-behavior').value = c.behavior;
+        document.getElementById('edit-detail').value = c.detail;
+
+        // Update Button Status Text
+        const btnToggle = document.getElementById('btn-toggle-status');
+        if(c.status === 'resolved') {
+            btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
+            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
+        } else {
+            btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
+            btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+        }
+
+        // Store original state for comparison
+        originalCaseState = JSON.stringify(c);
+
+        // Show Modal
+        const backdrop = document.getElementById('modal-backdrop');
+        const content = document.getElementById('modal-content');
+        backdrop.classList.remove('hidden');
+        // Small delay for animation
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeModal() {
+        const backdrop = document.getElementById('modal-backdrop');
+        const content = document.getElementById('modal-content');
+        
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+            originalCaseState = null;
+        }, 200);
+    }
+
+    function getCurrentModalData() {
+        const id = Number(document.getElementById('edit-id').value);
+        // Find current status from DB because form doesn't have status input
+        const currentDB = casesData.find(x => x.id === id);
+        
+        return {
+            id: id,
+            date: document.getElementById('edit-date').value,
+            time: document.getElementById('edit-time').value,
+            name: document.getElementById('edit-name').value,
+            grade: document.getElementById('edit-grade').value,
+            room: document.getElementById('edit-room').value,
+            behavior: document.getElementById('edit-behavior').value,
+            detail: document.getElementById('edit-detail').value,
+            status: currentDB ? currentDB.status : 'pending',
+            timestamp: currentDB ? currentDB.timestamp : new Date().toISOString()
+        };
+    }
+
+    function closeModalWithCheck() {
+        if(!originalCaseState) { closeModal(); return; }
+
+        const currentData = getCurrentModalData();
+        const originalData = JSON.parse(originalCaseState);
+
+        // Compare keys that are editable
+        const keys = ['date', 'time', 'name', 'grade', 'room', 'behavior', 'detail'];
+        let hasChanges = false;
+        for(let k of keys) {
+            if(currentData[k] !== originalData[k]) {
+                hasChanges = true;
+                break;
+            }
+        }
+
+        if(hasChanges) {
+            if(confirm('มีการแก้ไขข้อมูลที่ยังไม่ได้บันทึก ต้องการบันทึกก่อนปิดหรือไม่?')) {
+                saveCaseChanges();
+            } else {
+                closeModal();
+            }
+        } else {
+            closeModal();
         }
     }
 
-    function deleteCase(id) {
-        if(confirm('ต้องการลบข้อมูลนี้ใช่หรือไม่?')) {
-            casesData = casesData.filter(c => c.id !== id);
+    function saveCaseChanges() {
+        const newData = getCurrentModalData();
+        const index = casesData.findIndex(x => x.id === newData.id);
+        
+        if(index !== -1) {
+            casesData[index] = newData;
             localStorage.setItem(DB_KEY, JSON.stringify(casesData));
-            renderTable();
+            showToast('บันทึกการแก้ไขสำเร็จ');
+            renderTable(); // Refresh table background
+            originalCaseState = JSON.stringify(newData); // Reset original state to new saved state
+            // Optionally close modal or keep open
+            // closeModal(); 
+        }
+    }
+
+    function deleteCaseFromModal() {
+        if(confirm('ยืนยันการลบเคสนี้ถาวร?')) {
+            const id = Number(document.getElementById('edit-id').value);
+            casesData = casesData.filter(x => x.id !== id);
+            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
             showToast('ลบข้อมูลเรียบร้อย');
+            renderTable();
+            originalCaseState = null; // Prevent check on close
+            closeModal();
+        }
+    }
+
+    function toggleStatusFromModal() {
+        const id = Number(document.getElementById('edit-id').value);
+        const index = casesData.findIndex(x => x.id === id);
+        
+        if(index !== -1) {
+            const newStatus = casesData[index].status === 'resolved' ? 'pending' : 'resolved';
+            casesData[index].status = newStatus;
+            
+            // Also update form ID hidden field's connected data implicitly or re-open
+            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
+            
+            // Re-render button in modal
+            const btnToggle = document.getElementById('btn-toggle-status');
+            if(newStatus === 'resolved') {
+                btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
+                btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
+            } else {
+                btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
+                btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+            }
+
+            // Update original state so closing doesn't prompt for status change unless other fields changed
+            // We need to update the internal object tracking status
+            const currentModalData = getCurrentModalData();
+            currentModalData.status = newStatus; 
+            // Note: If user edited text fields AND clicked toggle without saving text, 
+            // originalState check will still flag text changes. That's good behavior.
+            
+            // However, we should probably save everything when toggling status?
+            // User requested: "Toggle button to change status". Let's assume it saves immediately or updates state.
+            // Let's allow it to be an independent action that saves immediately.
+            showToast(`เปลี่ยนสถานะเป็น ${newStatus === 'resolved' ? 'เสร็จสิ้น' : 'รอดำเนินการ'}`);
+            renderTable();
         }
     }
 
