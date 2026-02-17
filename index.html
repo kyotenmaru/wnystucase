@@ -139,7 +139,7 @@
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-24 h-24 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30 shadow-xl overflow-hidden p-2">
             <!-- ใส่ลิงก์รูปภาพของคุณที่ src="" -->
-            <img src="Wny-logo.png" alt="Logo" class="w-full h-full object-contain">
+            <img src="https://placehold.co/200x200/white/indigo?text=SCHOOL+LOGO" alt="Logo" class="w-full h-full object-contain">
           </div>
           <h1 class="text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบดูแลนักเรียน</h1>
           <p class="text-indigo-100 text-sm font-light">Student Behavior Management System</p>
@@ -182,7 +182,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0 overflow-hidden">
                     <!-- ใส่ลิงก์รูปภาพของคุณที่ src="" -->
-                    <img src="Wny-logo.png" alt="Logo" class="w-full h-full object-cover">
+                    <img src="https://placehold.co/100x100/indigo/white?text=LOGO" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div class="sidebar-text overflow-hidden">
                     <h2 class="text-white font-bold text-lg leading-tight truncate">StudentCare</h2>
@@ -956,6 +956,56 @@
         localStorage.setItem(SESSIONS_KEY, JSON.stringify(activeSessions));
     }
 
+    // --- Auto Logout System ---
+    const AUTO_LOGOUT_TIME = 30 * 60 * 1000; // 30 minutes
+    let inactivityTimer;
+
+    function startAutoLogoutTimer() {
+        // Events that reset the timer
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetAutoLogoutTimer);
+        });
+        resetAutoLogoutTimer();
+    }
+
+    function stopAutoLogoutTimer() {
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+            document.removeEventListener(event, resetAutoLogoutTimer);
+        });
+        clearTimeout(inactivityTimer);
+    }
+
+    function resetAutoLogoutTimer() {
+        clearTimeout(inactivityTimer);
+        if (currentUser) {
+            inactivityTimer = setTimeout(() => {
+                handleAutoLogout();
+            }, AUTO_LOGOUT_TIME);
+        }
+    }
+
+    function handleAutoLogout() {
+        if (currentUser) {
+            logAction(currentUser, 'หมดเวลาเชื่อมต่อ (Auto Logout)');
+            updateSession(currentUser, false);
+            
+            currentUser = null;
+            stopAutoLogoutTimer();
+            
+            // Switch UI
+            document.getElementById('dashboard-layout').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+
+            // Reset specific components if needed
+            if(adminUpdateInterval) clearInterval(adminUpdateInterval);
+            
+            alert('ระบบทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 30 นาที');
+        }
+    }
+
     // --- Dynamic Student Rows Logic ---
     function createStudentRowHTML(index) {
         // Generate Prefix Options
@@ -1047,6 +1097,7 @@
             }
 
             initDashboard();
+            startAutoLogoutTimer();
         } else {
             document.getElementById('login-error').classList.remove('hidden');
         }
@@ -1059,6 +1110,7 @@
                 updateSession(currentUser, false);
             }
             currentUser = null;
+            stopAutoLogoutTimer();
             document.getElementById('dashboard-layout').classList.add('hidden');
             document.getElementById('login-page').classList.remove('hidden');
             document.getElementById('username').value = '';
