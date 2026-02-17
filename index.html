@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบดูแลพฤติกรรมนักเรียน</title>
+  <title>ระบบสถิติพฤติกรรมนักเรียน</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -135,7 +135,7 @@
           <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30 shadow-xl">
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           </div>
-          <h1 class="text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบดูแลพฤติกรรมนักเรียน</h1>
+          <h1 class="text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบดูแลนักเรียน</h1>
           <p class="text-indigo-100 text-sm font-light">Student Behavior Management System</p>
         </div>
 
@@ -178,8 +178,8 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                 </div>
                 <div class="sidebar-text overflow-hidden">
-                    <h2 class="text-white font-bold text-lg leading-tight truncate">ระบบดูแลพฤติกรรมนักเรียน</h2>
-                    <p class="text-xs text-slate-500 truncate">Version v0.5</p>
+                    <h2 class="text-white font-bold text-lg leading-tight truncate">StudentCare</h2>
+                    <p class="text-xs text-slate-500 truncate">System v1.0</p>
                 </div>
             </div>
             <!-- Toggle Button -->
@@ -333,9 +333,17 @@
                                 <input type="date" id="input-date" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">เวลา (ประมาณ)</label>
-                                <!-- Enforced step=60 for time input -->
-                                <input type="time" id="input-time" step="60" lang="th-TH" class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">เวลา (ชั่วโมง : นาที)</label>
+                                <!-- Custom 24h Time Picker -->
+                                <div class="flex gap-2">
+                                    <select id="input-time-hour" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg appearance-none bg-white text-center">
+                                        <!-- JS Generated -->
+                                    </select>
+                                    <span class="self-center font-bold text-slate-400">:</span>
+                                    <select id="input-time-minute" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg appearance-none bg-white text-center">
+                                        <!-- JS Generated -->
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -520,9 +528,17 @@
                           <input type="date" id="edit-date" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-500 mb-1">เวลา</label>
-                          <!-- Enforced step=60 for time input -->
-                          <input type="time" id="edit-time" step="60" lang="th-TH" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                          <label class="block text-xs font-bold text-slate-500 mb-1">เวลา (24 ชม.)</label>
+                          <!-- Custom 24h Time Picker -->
+                          <div class="flex gap-2">
+                              <select id="edit-time-hour" class="form-input w-1/2 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-center">
+                                  <!-- JS Generated -->
+                              </select>
+                              <span class="self-center font-bold text-slate-400">:</span>
+                              <select id="edit-time-minute" class="form-input w-1/2 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-center">
+                                  <!-- JS Generated -->
+                              </select>
+                          </div>
                       </div>
                   </div>
                   
@@ -809,6 +825,39 @@
     const formatDateTime = (dateStr) => {
         const d = new Date(dateStr);
         return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('th-TH', { hour12: false });
+    }
+
+    // --- Helper Functions for Time Picker (Select Based) ---
+    function populateTimeSelects() {
+        const hours = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0'));
+        const minutes = Array.from({length: 60}, (_, i) => String(i).padStart(2, '0'));
+
+        const createOptions = (arr) => arr.map(val => `<option value="${val}">${val}</option>`).join('');
+
+        ['input', 'edit'].forEach(prefix => {
+            const hSelect = document.getElementById(`${prefix}-time-hour`);
+            const mSelect = document.getElementById(`${prefix}-time-minute`);
+            if (hSelect && mSelect) {
+                hSelect.innerHTML = createOptions(hours);
+                mSelect.innerHTML = createOptions(minutes);
+            }
+        });
+    }
+
+    function setTimeSelects(prefix, timeStr) {
+        // timeStr format HH:mm
+        if (!timeStr) return;
+        const [h, m] = timeStr.split(':');
+        const hSelect = document.getElementById(`${prefix}-time-hour`);
+        const mSelect = document.getElementById(`${prefix}-time-minute`);
+        if (hSelect) hSelect.value = h;
+        if (mSelect) mSelect.value = m;
+    }
+
+    function getTimeFromSelects(prefix) {
+        const h = document.getElementById(`${prefix}-time-hour`).value;
+        const m = document.getElementById(`${prefix}-time-minute`).value;
+        return `${h}:${m}`;
     }
 
     // Helper for Thai Time (HH:mm)
@@ -1128,7 +1177,7 @@
         const newCase = {
             id: Date.now(),
             date: document.getElementById('input-date').value,
-            time: document.getElementById('input-time').value,
+            time: getTimeFromSelects('input'), // Use Dropdown Time
             students: studentsList, 
             behavior: selectedBehavior,
             viceDetail: viceDetail,
@@ -1147,7 +1196,7 @@
     function resetForm() {
         document.getElementById('record-form').reset();
         document.getElementById('input-date').valueAsDate = new Date();
-        document.getElementById('input-time').value = getCurrentTime(); // Set Default Time (Thai)
+        setTimeSelects('input', getCurrentTime()); // Reset Dropdown Time
         document.getElementById('student-container').innerHTML = '';
         addStudentRow(); // Add initial row
         toggleViceOptions();
@@ -1319,7 +1368,7 @@
         // Populate Basic
         document.getElementById('edit-id').value = c.id;
         document.getElementById('edit-date').value = c.date;
-        document.getElementById('edit-time').value = c.time;
+        setTimeSelects('edit', c.time); // Set Dropdown Time in Modal
         document.getElementById('edit-behavior').value = c.behavior;
         document.getElementById('edit-detail').value = c.detail;
         
@@ -1420,7 +1469,7 @@
         return {
             id: id,
             date: document.getElementById('edit-date').value,
-            time: document.getElementById('edit-time').value,
+            time: getTimeFromSelects('edit'), // Get time from edit selects
             students: studentsList,
             behavior: behavior,
             viceDetail: viceDetail,
@@ -1504,8 +1553,9 @@
     }
 
     function initDashboard() {
+        populateTimeSelects(); // Initialize Select Options
         document.getElementById('input-date').valueAsDate = new Date();
-        document.getElementById('input-time').value = getCurrentTime(); // Set Default Time
+        setTimeSelects('input', getCurrentTime()); // Set Default Time using custom select
         
         // Init form with 1 row
         if(document.getElementById('student-container').children.length === 0) {
