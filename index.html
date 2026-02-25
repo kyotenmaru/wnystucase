@@ -51,9 +51,9 @@
 
     <div id="dashboard-layout" class="hidden w-full h-full flex bg-slate-50 relative overflow-hidden">
       
-      <div id="mobile-backdrop" onclick="toggleSidebar()" class="hidden sidebar-backdrop lg:hidden"></div>
+      <div id="mobile-backdrop" onclick="toggleSidebar()" class="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ease-in-out opacity-0 pointer-events-none lg:hidden"></div>
 
-      <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl transition-all duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-64">
+      <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl transition-transform duration-500 cubic-bezier(0.33, 1, 0.68, 1) transform -translate-x-full lg:translate-x-0 lg:static lg:w-64">
         
         <div id="sidebar-header" class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
