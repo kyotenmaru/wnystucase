@@ -108,15 +108,24 @@ function toggleSidebar() {
             }, 50);
         }
     } else {
-        // === Logic สำหรับ Mobile/Tablet (Slide Over) ===
-        if (sidebar.classList.contains('-translate-x-full')) {
-            // เปิด: ลบ class ที่ดันออกไปซ้าย
+        // === Mobile Logic (ปรับปรุงใหม่ให้ Fade & Slide สวยๆ) ===
+        // เช็คว่า sidebar ซ่อนอยู่ไหม (ถ้ามี -translate-x-full แปลว่าซ่อน)
+        const isHidden = sidebar.classList.contains('-translate-x-full');
+
+        if (isHidden) {
+            // เปิดเมนู: เลื่อนเข้ามา + ฉากหลังค่อยๆ ชัด
             sidebar.classList.remove('-translate-x-full');
-            backdrop.classList.remove('hidden');
+            
+            // Backdrop Effect
+            backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            backdrop.classList.add('opacity-100', 'pointer-events-auto');
         } else {
-            // ปิด: ดันกลับไปทางซ้าย
+            // ปิดเมนู: เลื่อนกลับไป + ฉากหลังค่อยๆ จาง
             sidebar.classList.add('-translate-x-full');
-            backdrop.classList.add('hidden');
+            
+            // Backdrop Effect
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
         }
     }
 }
@@ -125,19 +134,12 @@ function toggleSidebar() {
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
         if (window.innerWidth < 1024) { 
-            document.getElementById('main-sidebar').classList.add('-translate-x-full');
-            document.getElementById('mobile-backdrop').classList.add('hidden');
-        }
-    });
-});
-
-// เพิ่ม Event Listener ให้ปิดเมนูอัตโนมัติเมื่อกดเมนูย่อยในมือถือ
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        if (window.innerWidth < 1024) { // ถ้าเป็นมือถือ
-            isSidebarOpen = false;
-            document.getElementById('main-sidebar').classList.add('-translate-x-full');
-            document.getElementById('mobile-backdrop').classList.add('hidden');
+            const sidebar = document.getElementById('main-sidebar');
+            const backdrop = document.getElementById('mobile-backdrop');
+            
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
         }
     });
 });
