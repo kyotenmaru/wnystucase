@@ -224,25 +224,40 @@ const behaviorLabels = {
     'relationship': { label: 'ชู้สาว', color: 'text-pink-600 bg-pink-50' }
 };
 
-// --- Sidebar Logic ---
+// --- Sidebar Logic (Updated for Mobile) ---
 function toggleSidebar() {
     isSidebarOpen = !isSidebarOpen;
     const sidebar = document.getElementById('main-sidebar');
-    const bottomIcon = document.getElementById('sidebar-toggle-icon-bottom');
-    const headerIcon = document.getElementById('sidebar-toggle-icon');
+    const backdrop = document.getElementById('mobile-backdrop');
     
-    if (isSidebarOpen) {
-        sidebar.classList.remove('w-20', 'sidebar-collapsed');
-        sidebar.classList.add('w-72');
-        bottomIcon.classList.add('rotate-180'); 
-        if(headerIcon) headerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
+    // ตรวจสอบว่าหน้าจอเป็นมือถือหรือไม่ (ดูจาก class ที่ซ่อนอยู่)
+    // ถ้าหน้าจอกว้าง (lg) จะใช้ Logic เดิม
+    if (window.innerWidth >= 1024) { 
+        // Desktop Logic
+        // ... (ถ้าอยากให้ Desktop ย่อขยายได้เหมือนเดิม ใส่ logic เดิมตรงนี้)
+        // แต่ใน HTML ใหม่ ผมตั้งค่าให้ Desktop มันโชว์ตลอด (Fixed) เพื่อความง่ายครับ
     } else {
-        sidebar.classList.remove('w-72');
-        sidebar.classList.add('w-20', 'sidebar-collapsed');
-        bottomIcon.classList.remove('rotate-180'); 
-        if(headerIcon) headerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>';
+        // Mobile Logic
+        if (isSidebarOpen) {
+            sidebar.classList.remove('-translate-x-full'); // เลื่อนออกมา
+            backdrop.classList.remove('hidden'); // โชว์ฉากหลังดำๆ
+        } else {
+            sidebar.classList.add('-translate-x-full'); // เลื่อนกลับไปซ่อน
+            backdrop.classList.add('hidden'); // ซ่อนฉากหลัง
+        }
     }
 }
+
+// เพิ่ม Event Listener ให้ปิดเมนูอัตโนมัติเมื่อกดเมนูย่อยในมือถือ
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth < 1024) { // ถ้าเป็นมือถือ
+            isSidebarOpen = false;
+            document.getElementById('main-sidebar').classList.add('-translate-x-full');
+            document.getElementById('mobile-backdrop').classList.add('hidden');
+        }
+    });
+});
 
 // --- Realtime Clock ---
 function updateRealTime() {
