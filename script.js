@@ -814,34 +814,27 @@ function deleteCaseFromModal() {
 }
 
 function toggleStatusFromModal() {
-    // 1. ดึง ID จากฟอร์มที่กำลังเปิดอยู่
     const id = Number(document.getElementById('edit-id').value);
-    
-    // 2. หาข้อมูลในฐานข้อมูล
     const index = casesData.findIndex(x => x.id === id);
 
     if(index !== -1) {
-        // 3. สลับสถานะ (ถ้าเป็น resolved ให้แก้เป็น pending, ถ้าไม่ใช่ ให้เป็น resolved)
-        const currentStatus = casesData[index].status;
-        const newStatus = currentStatus === 'resolved' ? 'pending' : 'resolved';
-        
-        // อัปเดตข้อมูลลงฐานข้อมูล
+        const newStatus = casesData[index].status === 'resolved' ? 'pending' : 'resolved';
         casesData[index].status = newStatus;
+
         localStorage.setItem(DB_KEY, JSON.stringify(casesData));
 
-        // 4. อัปเดตหน้าตาปุ่มทันที (ใช้ตัวแปร newStatus แทน c)
         const btnToggle = document.getElementById('btn-toggle-status');
         if(newStatus === 'resolved') {
-            // ถ้าสถานะใหม่คือ "เสร็จสิ้น" -> ปุ่มต้องชวนให้เปลี่ยนกลับเป็น "รอดำเนินการ" (สีส้ม)
             btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
-            btnToggle.className = 'flex-1 md:flex-none px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
+            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
         } else {
-            // ถ้าสถานะใหม่คือ "รอดำเนินการ" -> ปุ่มต้องชวนให้เปลี่ยนเป็น "ดำเนินการเสร็จสิ้น" (สีเขียว)
             btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
-            btnToggle.className = 'flex-1 md:flex-none px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+            btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
         }
 
-        // 5. แจ้งเตือนและรีเฟรชตารางข้างหลัง
+        const currentModalData = getCurrentModalData();
+        currentModalData.status = newStatus;
+
         showToast(`เปลี่ยนสถานะเป็น ${newStatus === 'resolved' ? 'เสร็จสิ้น' : 'รอดำเนินการ'}`);
         renderTable();
     }
