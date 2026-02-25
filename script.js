@@ -951,3 +951,69 @@ function initDashboard() {
     }
     updateStats();
 }
+// --- ฟังก์ชันเสริม: จัดการ Log (Export & Clear) ---
+
+function exportLogsToTxt() {
+    if (systemLogs.length === 0) {
+        alert('ไม่มีประวัติให้ดาวน์โหลด');
+        return;
+    }
+
+    // 1. จัดเตรียมข้อความที่จะใส่ในไฟล์ TXT
+    let txtContent = "=== ประวัติการเข้าใช้งานระบบ (วังน้ำเย็นวิทยาคม) ===\n\n";
+    systemLogs.forEach(log => {
+        txtContent += `เวลา: ${formatDateTime(log.timestamp)}\n`;
+        txtContent += `ผู้ใช้งาน: ${log.user}\n`;
+        txtContent += `กิจกรรม: ${log.action}\n`;
+        txtContent += `อุปกรณ์: ${log.device}\n`;
+        txtContent += `---------------------------------------\n`;
+    });
+
+    // 2. สร้างไฟล์ Blob (จำลองไฟล์ใน Browser) และสั่งดาวน์โหลด
+    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    // ตั้งชื่อไฟล์ตามเวลาปัจจุบัน
+    link.download = `system_logs_${new Date().getTime()}.txt`; 
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // คืนหน่วยความจำ
+    
+    showToast('ดาวน์โหลดไฟล์ TXT สำเร็จ');
+}
+
+function clearAdminLogs() {
+    if (systemLogs.length === 0) {
+        alert('ประวัติว่างเปล่าอยู่แล้ว');
+        return;
+    }
+
+    // 1. ขั้นตอนที่ 1: บังคับใส่รหัสผ่าน
+    const inputPassword = prompt("ความปลอดภัย: กรุณาใส่รหัสผ่าน Admin เพื่อยืนยันการล้างประวัติ");
+    
+    // เช็คว่ารหัสผ่านตรงกับ '1234' (รหัสเดียวกับตอน Login) หรือไม่
+    if (inputPassword === '1234') {
+        
+        // 2. ขั้นตอนที่ 2: ให้กดยืนยันอีกครั้ง
+        if (confirm("⚠️ คุณแน่ใจหรือไม่? การล้างประวัติจะไม่สามารถกู้ข้อมูลคืนได้")) {
+            
+            // ล้างข้อมูลใน Array
+            systemLogs = [];
+            localStorage.setItem(LOGS_KEY, JSON.stringify(systemLogs));
+            
+            showToast('ล้างประวัติระบบเรียบร้อยแล้ว');
+            
+            // บันทึก Log ใหม่ 1 บรรทัดว่ามีการกดล้างระบบโดยใคร (Best Practice)
+            logAction(currentUser, 'ล้างประวัติระบบทั้งหมด (Clear Logs)');
+            
+            // รีเฟรชตารางให้แสดงผลทันที
+            renderAdminPanel(); 
+        }
+    } else if (inputPassword !== null) {
+        // กรณีพิมพ์รหัสผิด (ถ้ากด Cancel จะได้ค่า null ซึ่งเราจะปล่อยผ่าน)
+        alert("❌ รหัสผ่านไม่ถูกต้อง! ยกเลิกการล้างข้อมูล");
+    }
+}
