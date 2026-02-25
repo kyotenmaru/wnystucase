@@ -2,28 +2,35 @@
 <html lang="th" class="h-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ระบบจัดการพฤติกรรมนักเรียน</title>
-  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="style.css">
+  <style>
+      /* เพิ่ม Overlay สำหรับปิด Sidebar บนมือถือ */
+      .sidebar-backdrop {
+          background-color: rgba(0,0,0,0.5);
+          position: fixed;
+          inset: 0;
+          z-index: 10;
+      }
+  </style>
 </head>
-<body class="h-full bg-slate-50 overflow-hidden text-slate-800">
+<body class="h-full bg-slate-50 text-slate-800">
   <div id="app" class="w-full h-full flex flex-col">
     
     <div id="login-page" class="w-full h-full flex items-center justify-center px-4 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800">
       <div class="max-w-md w-full animate-[slideInLeft_0.5s_ease-out]">
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-24 h-24 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30 shadow-xl overflow-hidden p-2">
+          <div class="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-white/20 rounded-2xl backdrop-blur-xl mb-6 border border-white/30 shadow-xl overflow-hidden p-2">
             <img src="Wny-logo2.png" alt="School Logo" class="w-full h-full object-contain">
           </div>
-          <h1 class="text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบจัดการพฤติกรรมนักเรียน</h1>
+          <h1 class="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-md">ระบบดูแลนักเรียน</h1>
           <p class="text-indigo-100 text-sm font-light">Student Behavior Management System</p>
         </div>
 
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/50">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 border border-white/50">
           <form onsubmit="handleLogin(event)">
             <div class="mb-5">
               <label class="block text-sm font-semibold text-slate-700 mb-2">ชื่อผู้ใช้งาน</label>
@@ -33,44 +40,38 @@
               <label class="block text-sm font-semibold text-slate-700 mb-2">รหัสผ่าน</label>
               <input type="password" id="password" value="1234" class="login-input w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none transition-colors bg-slate-50 focus:bg-white" placeholder="Password">
             </div>
-
             <div id="login-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 text-sm rounded-lg flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
             </div>
-
             <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95">เข้าสู่ระบบ</button>
           </form>
-          
-          <div class="mt-6 text-center">
-            <p class="text-xs text-slate-400"></p>
-          </div>
         </div>
       </div>
     </div>
 
-    <div id="dashboard-layout" class="hidden w-full h-full flex bg-slate-50">
+    <div id="dashboard-layout" class="hidden w-full h-full flex bg-slate-50 relative overflow-hidden">
       
-      <aside id="main-sidebar" class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
+      <div id="mobile-backdrop" onclick="toggleSidebar()" class="hidden sidebar-backdrop lg:hidden"></div>
+
+      <aside id="main-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 transition-transform duration-300 ease-in-out">
+        
         <div id="sidebar-header" class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0 overflow-hidden">
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden">
                     <img src="Wny-logo2.png" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div class="sidebar-text overflow-hidden">
-                    <h2 class="text-white font-bold text-lg leading-tight truncate">วังน้ำเย็นวิทยาคม</h2>
-                    <p class="text-xs text-slate-500 truncate">Version 0.5b</p>
+                    <h2 class="text-white font-bold text-lg leading-tight truncate">StudentCare</h2>
+                    <p class="text-xs text-slate-500 truncate">System v1.0</p>
                 </div>
             </div>
-            <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white p-1 rounded transition-colors sidebar-text">
-                <svg id="sidebar-toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
 
-        <div id="user-profile-container" class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3 transition-all duration-300">
-             <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                 AD
-             </div>
+        <div id="user-profile-container" class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3">
+             <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">AD</div>
              <div class="sidebar-text overflow-hidden">
                  <p id="display-name" class="text-white text-sm font-medium truncate">Admin Teacher</p>
                  <p id="display-role" class="text-xs text-slate-500 truncate">ฝ่ายปกครอง</p>
@@ -78,100 +79,96 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text">เมนูหลัก</p>
-          
-          <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="ภาพรวม">
+          <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span class="sidebar-text">ภาพรวม (Dashboard)</span>
+            <span class="sidebar-text">ภาพรวม</span>
           </button>
           
-          <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="บันทึกเคสใหม่">
+          <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             <span class="sidebar-text">บันทึกเคสใหม่</span>
           </button>
           
-          <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50" title="ประวัติ/รายการเคส">
+          <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            <span class="sidebar-text">ประวัติ/รายการเคส</span>
+            <span class="sidebar-text">รายการประวัติ</span>
           </button>
 
           <div id="admin-menu-section" class="hidden pt-6">
               <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text">ผู้ดูแลระบบ</p>
-              <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50" title="ตรวจสอบการใช้งาน">
+              <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                <span class="sidebar-text">ตรวจสอบการใช้งาน</span>
+                <span class="sidebar-text">ตรวจสอบระบบ</span>
               </button>
           </div>
         </nav>
 
         <div class="p-4 border-t border-slate-800">
-          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors" title="ออกจากระบบ">
+          <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 transition-colors">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             <span class="sidebar-text">ออกจากระบบ</span>
           </button>
         </div>
-        
-        <div class="p-2 flex justify-center border-t border-slate-800">
-             <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white p-1">
-                 <svg id="sidebar-toggle-icon-bottom" class="w-6 h-6 transform rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
-             </button>
-        </div>
       </aside>
 
-      <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
-          <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดสรุปผล</h2>
+      <div class="flex-1 flex flex-col h-full overflow-hidden w-full">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 shrink-0">
+          <div class="flex items-center gap-3">
+              <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-indigo-600 p-1">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+              </button>
+              <h2 id="page-title" class="text-lg md:text-xl font-bold text-slate-800 truncate w-48 md:w-auto">แดชบอร์ด</h2>
+          </div>
+          
           <div class="flex items-center gap-4">
-              <div class="text-right hidden sm:block">
-                  <p class="text-sm font-bold text-indigo-600 mt-0.5" id="realtime-clock">กำลังโหลด...</p>
-                  <p class="text-xs text-slate-500 font-medium text-right" id="academic-info">กำลังโหลด...</p>
+              <div class="text-right hidden md:block">
+                  <p class="text-sm font-bold text-indigo-600 mt-0.5" id="realtime-clock">...</p>
+                  <p class="text-xs text-slate-500 font-medium text-right" id="academic-info">...</p>
               </div>
           </div>
         </header>
 
-        <main class="flex-1 overflow-auto bg-slate-50 p-8">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 md:p-8">
             
             <div id="view-dashboard" class="space-y-6 animate-[fadeInUp_0.4s_ease-out]">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
                         <div>
                             <p class="text-sm font-medium text-slate-500 mb-1">เคสทั้งหมด</p>
-                            <h3 class="text-3xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors" id="stat-total">0</h3>
+                            <h3 class="text-3xl font-bold text-slate-800" id="stat-total">0</h3>
                         </div>
-                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         </div>
                     </div>
-
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
                         <div>
                             <p class="text-sm font-medium text-slate-500 mb-1">รอดำเนินการ</p>
                             <h3 class="text-3xl font-bold text-amber-500" id="stat-pending">0</h3>
                         </div>
-                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                     </div>
-
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between stat-card group">
                         <div>
                             <p class="text-sm font-medium text-slate-500 mb-1">แก้ไขแล้ว</p>
                             <h3 class="text-3xl font-bold text-emerald-600" id="stat-resolved">0</h3>
                         </div>
-                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100">
                         <h3 class="font-bold text-slate-800 mb-4">สถิติแยกตามพฤติกรรม</h3>
                         <div id="chart-behavior" class="space-y-4">
                             <div class="text-center text-slate-400 py-8">ไม่มีข้อมูล</div>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100">
                         <h3 class="font-bold text-slate-800 mb-4">สถิติแยกตามระดับชั้น</h3>
                         <div id="chart-grade" class="space-y-4">
                             <div class="text-center text-slate-400 py-8">ไม่มีข้อมูล</div>
@@ -180,38 +177,36 @@
                 </div>
             </div>
 
-            <div id="view-record" class="hidden max-w-4xl mx-auto animate-[fadeInUp_0.4s_ease-out]">
+            <div id="view-record" class="hidden w-full max-w-4xl mx-auto animate-[fadeInUp_0.4s_ease-out]">
                 <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5 md:px-8 md:py-6">
+                        <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            แบบฟอร์มบันทึกพฤติกรรม
+                            บันทึกพฤติกรรม
                         </h2>
-                        <p class="text-indigo-100 text-sm mt-1">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อความถูกต้องของสถิติ</p>
                     </div>
                     
-                    <form id="record-form" onsubmit="handleRecordSubmit(event)" class="p-8 space-y-6">
+                    <form id="record-form" onsubmit="handleRecordSubmit(event)" class="p-6 md:p-8 space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">วันที่เกิดเหตุ</label>
                                 <input type="date" id="input-date" required class="form-input w-full px-4 py-2.5 border border-slate-200 rounded-lg">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">เวลา (ชั่วโมง : นาที)</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">เวลา</label>
                                 <div class="flex gap-2">
-                                    <select id="input-time-hour" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg appearance-none bg-white text-center"></select>
+                                    <select id="input-time-hour" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg bg-white text-center"></select>
                                     <span class="self-center font-bold text-slate-400">:</span>
-                                    <select id="input-time-minute" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg appearance-none bg-white text-center"></select>
+                                    <select id="input-time-minute" class="form-input w-1/2 px-4 py-2.5 border border-slate-200 rounded-lg bg-white text-center"></select>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
+                        <div class="p-4 md:p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
                             <div class="flex justify-between items-center">
-                                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">ข้อมูลนักเรียน (กลุ่มเป้าหมาย)</h4>
-                                <button type="button" onclick="addStudentRow()" class="text-sm bg-white border border-indigo-200 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                    เพิ่มนักเรียน
+                                <h4 class="text-sm font-bold text-indigo-600 uppercase">ข้อมูลนักเรียน</h4>
+                                <button type="button" onclick="addStudentRow()" class="text-xs md:text-sm bg-white border border-indigo-200 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
+                                    + เพิ่มนักเรียน
                                 </button>
                             </div>
                             <div id="student-container" class="space-y-3"></div>
@@ -251,7 +246,7 @@
                             </div>
 
                             <div id="vice-sub-options" class="hidden mt-4 p-4 bg-slate-100 rounded-lg border border-slate-200 animate-[fadeInUp_0.2s_ease-out]">
-                                <label class="block text-xs font-bold text-slate-600 mb-2">ระบุประเภทอบายมุข:</label>
+                                <label class="block text-xs font-bold text-slate-600 mb-2">ระบุประเภท:</label>
                                 <select id="input-vice-type" class="form-input w-full px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                                     <option value="">-- เลือกประเภท --</option>
                                     <option value="สุรา">สุรา</option>
@@ -259,20 +254,20 @@
                                     <option value="บุหรี่ไฟฟ้า">บุหรี่ไฟฟ้า</option>
                                     <option value="กัญชา">กัญชา</option>
                                     <option value="ยาบ้า">ยาบ้า</option>
-                                    <option value="ยาโปร">ยาโปร (เขียว/เหลือง)</option>
+                                    <option value="ยาโปร">ยาโปร</option>
                                     <option value="น้ำกระท่อม">น้ำกระท่อม</option>
                                 </select>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียดเพิ่มเติม</label>
-                            <textarea id="input-detail" rows="4" class="form-input w-full px-4 py-3 border border-slate-200 rounded-lg resize-none" placeholder="ระบุรายละเอียดเหตุการณ์ สถานที่ หรือบุคคลที่เกี่ยวข้อง..."></textarea>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">รายละเอียด</label>
+                            <textarea id="input-detail" rows="4" class="form-input w-full px-4 py-3 border border-slate-200 rounded-lg resize-none" placeholder="ระบุรายละเอียด..."></textarea>
                         </div>
 
-                        <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
-                            <button type="button" onclick="resetForm()" class="px-6 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 font-medium rounded-lg transition-colors">ล้างค่า</button>
-                            <button type="submit" class="flex-1 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-indigo-200 transition-all active:scale-95">บันทึกข้อมูล</button>
+                        <div class="flex flex-col-reverse md:flex-row items-center gap-4 pt-4 border-t border-slate-100">
+                            <button type="button" onclick="resetForm()" class="w-full md:w-auto px-6 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 font-medium rounded-lg transition-colors">ล้างค่า</button>
+                            <button type="submit" class="w-full md:flex-1 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg shadow-indigo-200 transition-all active:scale-95">บันทึกข้อมูล</button>
                         </div>
                     </form>
                 </div>
@@ -281,9 +276,9 @@
             <div id="view-cases" class="hidden animate-[fadeInUp_0.4s_ease-out]">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <h3 class="font-bold text-slate-800 text-lg">รายการบันทึกย้อนหลัง</h3>
-                        <div class="flex gap-2">
-                            <select id="filter-grade" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
+                        <h3 class="font-bold text-slate-800 text-lg">รายการประวัติ</h3>
+                        <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                            <select id="filter-grade" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-full md:w-auto">
                                 <option value="all">ทุกระดับชั้น</option>
                                 <option value="ม.1">ม.1</option>
                                 <option value="ม.2">ม.2</option>
@@ -292,7 +287,7 @@
                                 <option value="ม.5">ม.5</option>
                                 <option value="ม.6">ม.6</option>
                             </select>
-                            <select id="filter-status" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50">
+                            <select id="filter-status" onchange="renderTable()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-full md:w-auto">
                                 <option value="all">สถานะทั้งหมด</option>
                                 <option value="pending">รอดำเนินการ</option>
                                 <option value="resolved">แก้ไขแล้ว</option>
@@ -300,7 +295,7 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
                                     <th class="px-6 py-4">วันที่</th>
@@ -319,10 +314,10 @@
             
             <div id="view-admin" class="hidden space-y-6 animate-[fadeInUp_0.4s_ease-out]">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div class="p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
                         <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
                             <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                            ผู้ใช้งานที่กำลังออนไลน์ (Active Sessions)
+                            ผู้ใช้งานออนไลน์
                         </h3>
                     </div>
                     <div class="p-6">
@@ -331,21 +326,18 @@
                 </div>
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
-                      <h3 class="font-bold text-slate-800 text-lg">ประวัติการเข้าใช้งาน (Login Logs)</h3>
-  
-                      <div class="flex gap-2">
-                        <button onclick="exportLogsToTxt()" class="text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                          Export TXT
-                        </button>
-                        <button onclick="clearAdminLogs()" class="text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg hover:bg-rose-100 transition-colors flex items-center gap-1">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                          ล้างประวัติ
-                        </button>
-                      </div>
+                        <h3 class="font-bold text-slate-800 text-lg">Log การเข้าใช้งาน</h3>
+                        <div class="flex gap-2">
+                            <button onclick="exportLogsToTxt()" class="text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1">
+                                TXT
+                            </button>
+                            <button onclick="clearAdminLogs()" class="text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg hover:bg-rose-100 transition-colors flex items-center gap-1">
+                                ล้าง
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto max-h-[500px]">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
                             <thead class="bg-slate-50 sticky top-0">
                                 <tr class="text-xs uppercase text-slate-500 font-semibold tracking-wider border-b border-slate-200">
                                     <th class="px-6 py-3">เวลา</th>
@@ -368,25 +360,24 @@
 
   <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
       <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform scale-95 opacity-0 transition-all duration-200 flex flex-col max-h-[90vh]">
-          <div class="p-6 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex justify-between items-center">
+          <div class="p-4 md:p-6 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex justify-between items-center">
               <div>
-                  <h3 class="text-lg font-bold text-slate-800">รายละเอียดและแก้ไขเคส</h3>
-                  <p class="text-xs text-slate-500 mt-1">สามารถแก้ไขข้อมูลและสถานะได้จากหน้านี้</p>
+                  <h3 class="text-lg font-bold text-slate-800">แก้ไขข้อมูล</h3>
               </div>
               <button onclick="closeModalWithCheck()" class="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
           </div>
           
-          <div class="p-6 overflow-y-auto">
+          <div class="p-4 md:p-6 overflow-y-auto">
               <form id="edit-form" class="space-y-6">
-                  <div class="grid grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                           <label class="block text-xs font-bold text-slate-500 mb-1">วันที่</label>
                           <input type="date" id="edit-date" class="form-input w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-500 mb-1">เวลา (24 ชม.)</label>
+                          <label class="block text-xs font-bold text-slate-500 mb-1">เวลา</label>
                           <div class="flex gap-2">
                               <select id="edit-time-hour" class="form-input w-1/2 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-center"></select>
                               <span class="self-center font-bold text-slate-400">:</span>
@@ -416,7 +407,7 @@
                   </div>
 
                   <div id="edit-vice-sub-options" class="hidden p-3 bg-slate-100 rounded-lg border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">ระบุประเภทอบายมุข:</label>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ระบุประเภท:</label>
                         <select id="edit-vice-type" class="form-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                             <option value="">-- เลือกประเภท --</option>
                             <option value="สุรา">สุรา</option>
@@ -424,7 +415,7 @@
                             <option value="บุหรี่ไฟฟ้า">บุหรี่ไฟฟ้า</option>
                             <option value="กัญชา">กัญชา</option>
                             <option value="ยาบ้า">ยาบ้า</option>
-                            <option value="ยาโปร">ยาโปร (เขียว/เหลือง)</option>
+                            <option value="ยาโปร">ยาโปร</option>
                             <option value="น้ำกระท่อม">น้ำกระท่อม</option>
                         </select>
                   </div>
@@ -436,51 +427,46 @@
                   
                   <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                       <h4 class="text-sm font-bold text-indigo-700 mb-2 flex items-center gap-2">
-                          <span>🤖 AI Assistant (ผู้ช่วยอัจฉริยะ)</span>
+                          <span>🤖 AI Assistant</span>
                       </h4>
-                      
-                      <div class="flex gap-2 mb-3">
-                          <button type="button" onclick="generateAIAdvice()" class="flex-1 text-xs bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-1">
-                              ✨ ขอคำแนะนำการแก้ไขปัญหา
+                      <div class="flex flex-col md:flex-row gap-2 mb-3">
+                          <button type="button" onclick="generateAIAdvice()" class="w-full text-xs bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-lg shadow-sm">
+                              ✨ ขอคำแนะนำ
                           </button>
-                          <button type="button" onclick="generateAILetter()" class="flex-1 text-xs bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-1">
-                              ✨ ร่างหนังสือเชิญผู้ปกครอง
+                          <button type="button" onclick="generateAILetter()" class="w-full text-xs bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-lg shadow-sm">
+                              ✨ ร่างหนังสือเชิญ
                           </button>
                       </div>
-
                       <div id="ai-loading" class="hidden text-center py-4">
-                          <div class="typing-indicator">
-                              <span></span><span></span><span></span>
-                          </div>
-                          <p class="text-xs text-indigo-400 mt-2">AI กำลังประมวลผล...</p>
+                          <div class="typing-indicator"><span></span><span></span><span></span></div>
                       </div>
-
                       <div id="ai-history-container" class="space-y-3 mt-3"></div>
                   </div>
-
                   <input type="hidden" id="edit-id">
               </form>
           </div>
 
-          <div class="p-6 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex flex-wrap items-center gap-3">
-              <button onclick="saveCaseChanges()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                  บันทึกการแก้ไข
+          <div class="p-4 md:p-6 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex flex-col md:flex-row flex-wrap items-stretch md:items-center gap-3">
+              <button onclick="saveCaseChanges()" class="md:flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm">
+                  บันทึก
               </button>
-              <button onclick="deleteCaseFromModal()" class="px-4 py-2 bg-rose-100 text-rose-600 hover:bg-rose-200 rounded-lg text-sm font-semibold transition-colors">
-                  ลบเคส
-              </button>
-              <button onclick="toggleStatusFromModal()" id="btn-toggle-status" class="px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors">
-                  เปลี่ยนสถานะ
-              </button>
-              <button onclick="closeModalWithCheck()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-colors">
-                  ปิด
-              </button>
+              <div class="flex gap-2 justify-center">
+                  <button onclick="deleteCaseFromModal()" class="flex-1 md:flex-none px-4 py-2 bg-rose-100 text-rose-600 hover:bg-rose-200 rounded-lg text-sm font-semibold">
+                      ลบ
+                  </button>
+                  <button onclick="toggleStatusFromModal()" id="btn-toggle-status" class="flex-1 md:flex-none px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold">
+                      สถานะ
+                  </button>
+                  <button onclick="closeModalWithCheck()" class="flex-1 md:flex-none px-4 py-2 bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold">
+                      ปิด
+                  </button>
+              </div>
           </div>
       </div>
   </div>
 
-  <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-[60]">
-      <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+  <div id="toast" class="fixed bottom-6 right-6 md:right-6 left-6 md:left-auto transform translate-y-20 opacity-0 transition-all duration-300 z-[60]">
+      <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center justify-center gap-3">
           <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           <span id="toast-msg">บันทึกข้อมูลสำเร็จ</span>
       </div>
