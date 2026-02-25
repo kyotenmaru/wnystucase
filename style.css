@@ -93,27 +93,6 @@
   40% { transform: scale(1); }
 }
 
-/* AI Card Transitions */
-.ai-card-content {
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
-    max-height: 5000px;
-    opacity: 1;
-    overflow: hidden;
-}
-.ai-card-collapsed .ai-card-content {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-top: none;
-}
-.ai-arrow {
-    transition: transform 0.3s ease;
-}
-.ai-card-collapsed .ai-arrow {
-    transform: rotate(-90deg);
-}
-
 /* Force 24h look on Webkit Time Inputs */
 input[type="time"]::-webkit-datetime-edit-ampm-field {
     display: none;
