@@ -823,13 +823,19 @@ function toggleStatusFromModal() {
         
         localStorage.setItem(DB_KEY, JSON.stringify(casesData));
         
-        const btnToggle = document.getElementById('btn-toggle-status');
-        if(newStatus === 'resolved') {
-            btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
-            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
-        } else {
-            btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
-            btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+       const btnToggle = document.getElementById('btn-toggle-status');
+        if (btnToggle) {
+            // เช็คสถานะปัจจุบันของเคส
+            // ถ้าสถานะเป็น "แก้ไขแล้ว" (resolved) -> ปุ่มจะชวนให้เปลี่ยนกลับเป็น "รอดำเนินการ" (สีส้ม)
+            if (c.status === 'resolved') {
+                btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
+                btnToggle.className = 'flex-1 md:flex-none px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
+            } 
+            // ถ้าเป็นสถานะอื่น (เช่น 'pending' หรือเคสใหม่) -> ปุ่มจะชวนให้เปลี่ยนเป็น "ดำเนินการเสร็จสิ้น" (สีเขียว)
+            else {
+                btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
+                btnToggle.className = 'flex-1 md:flex-none px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+            }
         }
 
         const currentModalData = getCurrentModalData();
