@@ -53,16 +53,16 @@
       
       <div id="mobile-backdrop" onclick="toggleSidebar()" class="hidden sidebar-backdrop lg:hidden"></div>
 
-      <aside id="main-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 transition-transform duration-300 ease-in-out">
+      <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl transition-all duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-64">
         
         <div id="sidebar-header" class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden">
                     <img src="Wny-logo2.png" alt="Logo" class="w-full h-full object-contain">
                 </div>
-                <div class="sidebar-text overflow-hidden">
-                    <h2 class="text-white font-bold text-lg leading-tight truncate">StudentCare</h2>
-                    <p class="text-xs text-slate-500 truncate">System v1.0</p>
+                <div class="sidebar-text overflow-hidden whitespace-nowrap">
+                    <h2 class="text-white font-bold text-lg leading-tight truncate">วังน้ำเย็นวิทยาคม</h2>
+                    <p class="text-xs text-slate-500 truncate">System v0.6b</p>
                 </div>
             </div>
             <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
@@ -70,35 +70,35 @@
             </button>
         </div>
 
-        <div id="user-profile-container" class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3">
+        <div id="user-profile-container" class="p-4 mx-4 mt-6 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center gap-3 overflow-hidden">
              <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">AD</div>
-             <div class="sidebar-text overflow-hidden">
+             <div class="sidebar-text overflow-hidden whitespace-nowrap">
                  <p id="display-name" class="text-white text-sm font-medium truncate">Admin Teacher</p>
                  <p id="display-role" class="text-xs text-slate-500 truncate">ฝ่ายปกครอง</p>
              </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto overflow-x-hidden">
           <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span class="sidebar-text">ภาพรวม</span>
+            <span class="sidebar-text whitespace-nowrap">ภาพรวม</span>
           </button>
           
           <button onclick="switchPage('record')" id="nav-record" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-            <span class="sidebar-text">บันทึกเคสใหม่</span>
+            <span class="sidebar-text whitespace-nowrap">บันทึกเคสใหม่</span>
           </button>
           
           <button onclick="switchPage('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium hover:text-white hover:bg-slate-800/50">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            <span class="sidebar-text">รายการประวัติ</span>
+            <span class="sidebar-text whitespace-nowrap">รายการประวัติ</span>
           </button>
 
           <div id="admin-menu-section" class="hidden pt-6">
-              <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text">ผู้ดูแลระบบ</p>
+              <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 sidebar-text whitespace-nowrap">ผู้ดูแลระบบ</p>
               <button onclick="switchPage('admin')" id="nav-admin" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-slate-800/50">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                <span class="sidebar-text">ตรวจสอบระบบ</span>
+                <span class="sidebar-text whitespace-nowrap">ตรวจสอบระบบ</span>
               </button>
           </div>
         </nav>
@@ -106,15 +106,15 @@
         <div class="p-4 border-t border-slate-800">
           <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium text-rose-400 hover:bg-rose-950/30 transition-colors">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            <span class="sidebar-text">ออกจากระบบ</span>
+            <span class="sidebar-text whitespace-nowrap">ออกจากระบบ</span>
           </button>
         </div>
       </aside>
 
-      <div class="flex-1 flex flex-col h-full overflow-hidden w-full">
+      <div class="flex-1 flex flex-col h-full overflow-hidden w-full transition-all duration-300">
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 shrink-0">
           <div class="flex items-center gap-3">
-              <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-indigo-600 p-1">
+              <button onclick="toggleSidebar()" class="text-slate-500 hover:text-indigo-600 p-1 rounded-md hover:bg-slate-100 transition-colors">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
               </button>
               <h2 id="page-title" class="text-lg md:text-xl font-bold text-slate-800 truncate w-48 md:w-auto">แดชบอร์ด</h2>
