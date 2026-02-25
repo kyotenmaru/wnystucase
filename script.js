@@ -144,6 +144,17 @@ document.querySelectorAll('.nav-item').forEach(item => {
     });
 });
 
+// เพิ่ม Event Listener ให้ปิดเมนูอัตโนมัติเมื่อกดเมนูย่อยในมือถือ
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth < 1024) { // ถ้าเป็นมือถือ
+            isSidebarOpen = false;
+            document.getElementById('main-sidebar').classList.add('-translate-x-full');
+            document.getElementById('mobile-backdrop').classList.add('hidden');
+        }
+    });
+});
+
 // --- Realtime Clock ---
 function updateRealTime() {
     const now = new Date();
