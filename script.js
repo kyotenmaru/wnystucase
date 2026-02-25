@@ -17,147 +17,6 @@ let adminUpdateInterval = null; // Declare interval variable
 const prefixes = ['เด็กชาย', 'เด็กหญิง', 'นาย', 'นางสาว'];
 const grades = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'];
 
-// --- Gemini API Integration ---
-const apiKey = ""; // ใส่ API Key ที่นี่ (อย่า commit ขึ้น github public)
-
-async function callGemini(prompt, type) {
-    const loading = document.getElementById('ai-loading');
-    loading.classList.remove('hidden');
-
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
-        });
-
-        if (!response.ok) throw new Error('API Error');
-
-        const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text;
-        
-        // Save to case history
-        const caseId = Number(document.getElementById('edit-id').value);
-        const caseIndex = casesData.findIndex(c => c.id === caseId);
-        
-        if (caseIndex !== -1) {
-            const newResponse = {
-                id: Date.now(),
-                type: type,
-                content: text,
-                timestamp: new Date().toISOString()
-            };
-            
-            if (!casesData[caseIndex].aiHistory) {
-                casesData[caseIndex].aiHistory = [];
-            }
-            casesData[caseIndex].aiHistory.push(newResponse);
-            localStorage.setItem(DB_KEY, JSON.stringify(casesData));
-            
-            // Render update
-            renderAIHistory(casesData[caseIndex].aiHistory);
-        }
-
-    } catch (error) {
-        alert(`เกิดข้อผิดพลาด: ${error.message}`);
-    } finally {
-        loading.classList.add('hidden');
-    }
-}
-
-function renderAIHistory(history) {
-    const container = document.getElementById('ai-history-container');
-    container.innerHTML = '';
-
-    if (!history || history.length === 0) return;
-
-    // Sort new to old
-    [...history].reverse().forEach(item => {
-        const timeStr = new Date(item.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
-        
-        const card = document.createElement('div');
-        card.id = `ai-response-${item.id}`;
-        card.className = 'border border-indigo-100 rounded-lg overflow-hidden bg-white shadow-sm transition-all ai-card-collapsed';
-        card.innerHTML = `
-            <div class="bg-indigo-50/50 px-3 py-2 flex justify-between items-center cursor-pointer hover:bg-indigo-50 transition-colors" onclick="toggleAIResponse('${item.id}')">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">${item.type}</span>
-                    <span class="text-[10px] text-slate-400 font-medium">${timeStr} น.</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="deleteAIResponse(event, ${item.id})" class="text-slate-400 hover:text-rose-500 transition-colors p-1" title="ลบ">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                    <svg id="arrow-${item.id}" class="w-4 h-4 text-indigo-400 ai-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-            </div>
-            <div class="ai-card-content border-t border-indigo-50/50">
-                <div class="p-3 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">${item.content}</div>
-            </div>
-        `;
-        container.appendChild(card);
-        
-        // Auto expand the first one (newest)
-        if (container.children.length === 1) {
-            setTimeout(() => toggleAIResponse(item.id), 50);
-        }
-    });
-}
-
-function toggleAIResponse(id) {
-    const card = document.getElementById(`ai-response-${id}`);
-    if (card) {
-        card.classList.toggle('ai-card-collapsed');
-    }
-}
-
-function deleteAIResponse(event, responseId) {
-    event.stopPropagation();
-    if (!confirm('ยืนยันการลบข้อความนี้จาก AI?')) return;
-
-    const caseId = Number(document.getElementById('edit-id').value);
-    const caseIndex = casesData.findIndex(c => c.id === caseId);
-
-    if (caseIndex !== -1 && casesData[caseIndex].aiHistory) {
-        casesData[caseIndex].aiHistory = casesData[caseIndex].aiHistory.filter(r => r.id !== responseId);
-        localStorage.setItem(DB_KEY, JSON.stringify(casesData));
-        renderAIHistory(casesData[caseIndex].aiHistory);
-        showToast('ลบข้อความ AI เรียบร้อย');
-    }
-}
-
-function getCaseInfoForAI() {
-    const students = [];
-    document.querySelectorAll('#edit-student-container .student-row').forEach(row => {
-        const name = row.querySelector('.input-name').value;
-        const grade = row.querySelector('.input-grade').value;
-        if(name) students.push(`${name} (${grade})`);
-    });
-
-    const behavior = document.getElementById('edit-behavior').value;
-    const subType = document.getElementById('edit-vice-type').value;
-    const detail = document.getElementById('edit-detail').value;
-    
-    let behaviorText = behaviorLabels[behavior]?.label || behavior;
-    if (behavior === 'vice' && subType) behaviorText += ` - ${subType}`;
-
-    return `นักเรียน: ${students.join(', ')}\nพฤติกรรม: ${behaviorText}\nรายละเอียด: ${detail}`;
-}
-
-function generateAIAdvice() {
-    const caseInfo = getCaseInfoForAI();
-    const prompt = `ทำหน้าที่เป็นผู้เชี่ยวชาญด้านจิตวิทยาและการให้คำปรึกษาในโรงเรียน วิเคราะห์เคสพฤติกรรมนักเรียนดังนี้:\n${caseInfo}\n\nขอคำแนะนำในการดำเนินการแก้ไขปัญหา 3 ข้อ ที่เป็นรูปธรรมและสร้างสรรค์ สำหรับครูที่ปรึกษา`;
-    callGemini(prompt, 'คำแนะนำ');
-}
-
-function generateAILetter() {
-    const caseInfo = getCaseInfoForAI();
-    const prompt = `ทำหน้าที่เป็นธุรการโรงเรียน ร่างหนังสือเชิญผู้ปกครองอย่างเป็นทางการ (ภาษาไทย) เพื่อเชิญมาพูดคุยเกี่ยวกับพฤติกรรมนักเรียน:\n${caseInfo}\n\nโทนของจดหมาย: สุภาพ ร่วมมือ และเป็นทางการ`;
-    callGemini(prompt, 'หนังสือเชิญ');
-}
-
 // --- Utils ---
 const showToast = (msg) => {
     const toast = document.getElementById('toast');
@@ -844,17 +703,6 @@ function openCaseModal(id) {
         container.appendChild(row);
     }
 
-    renderAIHistory(c.aiHistory);
-
-    const btnToggle = document.getElementById('btn-toggle-status');
-    if(c.status === 'resolved') {
-        btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
-        btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
-    } else {
-        btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
-        btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
-    }
-
     originalCaseState = JSON.stringify(getCurrentModalData()); 
 
     const backdrop = document.getElementById('modal-backdrop');
@@ -932,7 +780,6 @@ function saveCaseChanges() {
     const index = casesData.findIndex(x => x.id === newData.id);
     
     if(index !== -1) {
-        newData.aiHistory = casesData[index].aiHistory;
         casesData[index] = newData;
         localStorage.setItem(DB_KEY, JSON.stringify(casesData));
         showToast('บันทึกการแก้ไขสำเร็จ');
