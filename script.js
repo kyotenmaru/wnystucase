@@ -380,7 +380,7 @@ function switchPage(pageId) {
     }
 
     const titles = {
-        'dashboard': 'แดชบอร์ดสรุปผล',
+        'dashboard': 'แดชบอร์ด',
         'record': 'บันทึกข้อมูลใหม่',
         'cases': 'รายการประวัติ',
         'admin': 'ระบบตรวจสอบ (Admin Monitor)'
