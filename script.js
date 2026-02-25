@@ -224,29 +224,53 @@ const behaviorLabels = {
     'relationship': { label: 'ชู้สาว', color: 'text-pink-600 bg-pink-50' }
 };
 
-// --- Sidebar Logic (Updated for Mobile) ---
+// --- Sidebar Logic (Updated: Smooth Animation & PC Support) ---
 function toggleSidebar() {
-    isSidebarOpen = !isSidebarOpen;
+    // เช็คสถานะปัจจุบันจาก class แทนตัวแปร เพื่อความแม่นยำ
     const sidebar = document.getElementById('main-sidebar');
     const backdrop = document.getElementById('mobile-backdrop');
     
-    // ตรวจสอบว่าหน้าจอเป็นมือถือหรือไม่ (ดูจาก class ที่ซ่อนอยู่)
-    // ถ้าหน้าจอกว้าง (lg) จะใช้ Logic เดิม
+    // ตรวจสอบขนาดหน้าจอ
     if (window.innerWidth >= 1024) { 
-        // Desktop Logic
-        // ... (ถ้าอยากให้ Desktop ย่อขยายได้เหมือนเดิม ใส่ logic เดิมตรงนี้)
-        // แต่ใน HTML ใหม่ ผมตั้งค่าให้ Desktop มันโชว์ตลอด (Fixed) เพื่อความง่ายครับ
-    } else {
-        // Mobile Logic
-        if (isSidebarOpen) {
-            sidebar.classList.remove('-translate-x-full'); // เลื่อนออกมา
-            backdrop.classList.remove('hidden'); // โชว์ฉากหลังดำๆ
+        // === Logic สำหรับ PC (ซ่อน/แสดง แบบดันเนื้อหา หรือ หดหายไป) ===
+        // ถ้ามี class w-64 แสดงว่าเปิดอยู่ -> ให้ลบออกแล้วใส่ w-0 เพื่อซ่อน
+        if (sidebar.classList.contains('w-64') || sidebar.classList.contains('lg:w-64')) {
+            sidebar.classList.remove('lg:w-64', 'w-64', 'p-4'); // ลบความกว้างและ padding
+            sidebar.classList.add('w-0', 'overflow-hidden'); // ยุบเหลือ 0
+            // ซ่อนเนื้อหาภายใน sidebar เพื่อความเนียน
+            sidebar.querySelectorAll('.sidebar-text, #user-profile-container, #sidebar-header, nav, .border-t').forEach(el => el.classList.add('hidden'));
         } else {
-            sidebar.classList.add('-translate-x-full'); // เลื่อนกลับไปซ่อน
-            backdrop.classList.add('hidden'); // ซ่อนฉากหลัง
+            // เปิดกลับมา
+            sidebar.classList.remove('w-0', 'overflow-hidden');
+            sidebar.classList.add('w-64');
+            // แสดงเนื้อหากลับมา
+            setTimeout(() => { // หน่วงเวลานิดนึงให้ width เริ่มขยายก่อน
+                sidebar.querySelectorAll('.sidebar-text, #user-profile-container, #sidebar-header, nav, .border-t').forEach(el => el.classList.remove('hidden'));
+            }, 50);
+        }
+    } else {
+        // === Logic สำหรับ Mobile/Tablet (Slide Over) ===
+        if (sidebar.classList.contains('-translate-x-full')) {
+            // เปิด: ลบ class ที่ดันออกไปซ้าย
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+        } else {
+            // ปิด: ดันกลับไปทางซ้าย
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('hidden');
         }
     }
 }
+
+// Event Listener สำหรับปิดเมนูเมื่อกดเลือกเมนู (เฉพาะมือถือ)
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth < 1024) { 
+            document.getElementById('main-sidebar').classList.add('-translate-x-full');
+            document.getElementById('mobile-backdrop').classList.add('hidden');
+        }
+    });
+});
 
 // เพิ่ม Event Listener ให้ปิดเมนูอัตโนมัติเมื่อกดเมนูย่อยในมือถือ
 document.querySelectorAll('.nav-item').forEach(item => {
