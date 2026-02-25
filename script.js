@@ -321,8 +321,8 @@ function handleLogin(e) {
 
         document.getElementById('login-page').classList.add('hidden');
         document.getElementById('dashboard-layout').classList.remove('hidden');
-        document.getElementById('display-name').textContent = user === 'admin' ? 'Admin Teacher' : user;
-        document.getElementById('display-role').textContent = user === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : 'ครูที่ปรึกษา';
+        document.getElementById('display-name').textContent = user === 'admin' ? 'Admin' : user;
+        document.getElementById('display-role').textContent = user === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : 'ระเบียบวินัย';
         document.getElementById('user-avatar').textContent = user.substring(0,2).toUpperCase();
 
         if(user === 'admin') {
