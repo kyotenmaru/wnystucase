@@ -627,7 +627,7 @@ function renderTable() {
 
         const statusBadge = c.status === 'resolved' 
             ? '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">แก้ไขแล้ว</span>'
-            : '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">รอการแก้ไข</span>';
+            : '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">รอดำเนินการ</span>';
 
         let studentsDisplay = '';
         let gradesDisplay = '';
