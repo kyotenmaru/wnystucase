@@ -715,7 +715,18 @@ function openCaseModal(id) {
         row.querySelector('.input-room').value = c.room;
         container.appendChild(row);
     }
-
+// --- โค้ดที่เพิ่มใหม่: ตั้งค่าปุ่มให้แสดงสถานะปัจจุบัน ---
+    const btnToggle = document.getElementById('btn-toggle-status');
+    if (btnToggle) {
+        if (c.status === 'resolved') {
+            btnToggle.textContent = 'สถานะแก้ไขแล้ว';
+            btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+        } else {
+            btnToggle.textContent = 'สถานะรอดำเนินการ';
+            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
+        }
+    }
+    // ----------------------------------------------
     originalCaseState = JSON.stringify(getCurrentModalData()); 
 
     const backdrop = document.getElementById('modal-backdrop');
@@ -825,11 +836,11 @@ function toggleStatusFromModal() {
 
         const btnToggle = document.getElementById('btn-toggle-status');
         if(newStatus === 'resolved') {
-            btnToggle.textContent = 'เปลี่ยนเป็น: รอดำเนินการ';
-            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
-        } else {
-            btnToggle.textContent = 'เปลี่ยนเป็น: ดำเนินการเสร็จสิ้น';
+            btnToggle.textContent = 'สถานะแก้ไขแล้ว';
             btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
+        } else {
+            btnToggle.textContent = 'สถานะรอดำเนินการ';
+            btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
         }
 
         const currentModalData = getCurrentModalData();
