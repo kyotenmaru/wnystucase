@@ -719,10 +719,10 @@ function openCaseModal(id) {
     const btnToggle = document.getElementById('btn-toggle-status');
     if (btnToggle) {
         if (c.status === 'resolved') {
-            btnToggle.textContent = 'สถานะแก้ไขแล้ว';
+            btnToggle.textContent = 'สถานะ: แก้ไขแล้ว';
             btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
         } else {
-            btnToggle.textContent = 'สถานะรอดำเนินการ';
+            btnToggle.textContent = 'สถานะ: รอดำเนินการ';
             btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
         }
     }
@@ -836,10 +836,10 @@ function toggleStatusFromModal() {
 
         const btnToggle = document.getElementById('btn-toggle-status');
         if(newStatus === 'resolved') {
-            btnToggle.textContent = 'สถานะ:แก้ไขแล้ว';
+            btnToggle.textContent = 'สถานะ: แก้ไขแล้ว';
             btnToggle.className = 'px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-sm font-semibold transition-colors';
         } else {
-            btnToggle.textContent = 'สถานะ:รอดำเนินการ';
+            btnToggle.textContent = 'สถานะ: รอดำเนินการ';
             btnToggle.className = 'px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-lg text-sm font-semibold transition-colors';
         }
 
