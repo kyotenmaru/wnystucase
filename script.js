@@ -337,16 +337,26 @@ function handleLogin(e) {
     const pass = document.getElementById('password').value;
 
     if(pass === '1234' && user.trim() !== '') {
-        currentUser = user;
         
-        // --- ส่วนที่เพิ่มใหม่: สร้างบัตรคิว (Token) ประจำการล็อกอินครั้งนี้ ---
+        // 1. แอบเช็คฐานข้อมูลก่อนว่า ชื่อนี้กำลังออนไลน์อยู่หรือเปล่า
+        const liveSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+        const isAlreadyLoggedIn = !!liveSessions[user]; // ถ้ามีชื่ออยู่แปลว่า true
+
+        // 2. ตั้งค่าผู้ใช้และสร้างบัตรคิว (Token) ประจำเครื่อง
+        currentUser = user;
         currentSessionToken = "token_" + Date.now(); 
         
-        logAction(user, 'เข้าสู่ระบบ (Login)');
+        // 3. บันทึก Log แยกตามสถานการณ์
+        if (isAlreadyLoggedIn) {
+            logAction(user, 'เข้าสู่ระบบซ้อนทับอุปกรณ์เดิม (Concurrent Login)');
+        } else {
+            logAction(user, 'เข้าสู่ระบบ (Login)');
+        }
         
-        // --- ส่วนที่แก้: ส่งบัตรคิว (Token) ไปให้ระบบจำไว้ ---
+        // 4. ส่งข้อมูลเข้าระบบ
         updateSession(user, true, currentSessionToken); 
 
+        // 5. เปลี่ยนหน้าจอเข้าสู่แดชบอร์ด
         document.getElementById('login-page').classList.add('hidden');
         document.getElementById('dashboard-layout').classList.remove('hidden');
         document.getElementById('display-name').textContent = user === 'admin' ? 'Admin' : user;
