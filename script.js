@@ -956,10 +956,17 @@ function clearAdminLogs() {
 // ==========================================
 
 // 1. ฟังก์ชัน Logout เมื่อปิดหน้าต่าง (เพิ่มการเก็บ Log และส่ง Token)
+let isExiting = false; // เพิ่มตัวแปรเช็คว่ากำลังปิดเว็บอยู่หรือไม่
+
 function forceLogoutOnExit() {
-    if (currentUser) {
+    // เช็คว่ามีผู้ใช้ล็อกอินอยู่ และ ยังไม่ได้เริ่มกระบวนการปิดเว็บ
+    if (currentUser && !isExiting) {
+        isExiting = true; // ล็อกประตูเลย! เพื่อไม่ให้ Event ที่สองเข้ามาทำงานซ้ำ
+        
         logAction(currentUser, 'ปิดหน้าต่าง/แอป (Auto Logout)');
         updateSession(currentUser, false, currentSessionToken);
+        
+        currentUser = null; // เคลียร์ชื่อทิ้งป้องกันความผิดพลาด
     }
 }
 window.addEventListener('beforeunload', forceLogoutOnExit);
