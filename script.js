@@ -1003,18 +1003,22 @@ setInterval(() => {
         const liveSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
         const activeToken = liveSessions[currentUser];
 
-        // กรณีที่ 1: โดนแอดมินดีดออก (ชื่อหายไปจากระบบ)
+        // กรณีที่ 1: โดนแอดมินดีดออก (ชื่อหายไปจากระบบ - ยกเว้น admin จะไม่โดนเงื่อนไขนี้)
         if (!activeToken && currentUser !== 'admin') {
             forceKickOut('⚠️ คุณถูกผู้ดูแลระบบ (Admin) นำออกจากระบบ');
         }
-        // กรณีที่ 2: ล็อกอินซ้อน (รหัส Token ไม่ตรงกับเครื่องปัจจุบัน)
+        // กรณีที่ 2: ล็อกอินซ้อน (รหัส Token ไม่ตรงกับเครื่องปัจจุบัน - ตรวจจับทุกคนรวมถึง admin)
         else if (activeToken && activeToken !== currentSessionToken) {
+            
+            // --- ส่วนที่เพิ่มใหม่: เก็บ Log เมื่อโดนเตะเพราะล็อกอินซ้อน ---
+            logAction(currentUser, 'ถูกบังคับออกจากระบบ (ล็อกอินซ้อนจากอุปกรณ์อื่น)');
+            
             forceKickOut('⚠️ มีการเข้าสู่ระบบบัญชีนี้จากอุปกรณ์อื่น เครื่องนี้จึงถูกบังคับออกจากระบบ');
         }
     }
 }, 2000);
 
-// ฟังก์ชันย่อยสำหรับเด้งกลับหน้า Login
+// ฟังก์ชันย่อยสำหรับเด้งกลับหน้า Login (เหมือนเดิม)
 function forceKickOut(msg) {
     alert(msg);
     currentUser = null;
