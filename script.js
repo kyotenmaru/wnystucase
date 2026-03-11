@@ -422,17 +422,20 @@ function renderAdminPanel() {
     if(users.length === 0) {
         sessionContainer.innerHTML = '<div class="col-span-4 text-center text-slate-400 py-4">ไม่มีผู้ใช้งานออนไลน์</div>';
     } else {
-        sessionContainer.innerHTML = users.map(u => `
-            <div class="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
-                    ${u.substring(0,2).toUpperCase()}
+       sessionContainer.innerHTML = users.map(u => `
+            <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                        ${u.substring(0,2).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700">${u}</p>
+                        <p class="text-xs text-emerald-600 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> ออนไลน์
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-bold text-slate-700">${u}</p>
-                    <p class="text-xs text-emerald-600 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> ออนไลน์
-                    </p>
-                </div>
+                ${u !== 'admin' ? `<button onclick="kickUser('${u}')" class="text-[10px] bg-rose-100 text-rose-600 border border-rose-200 px-2 py-1 rounded hover:bg-rose-200 transition-colors">เตะออก</button>` : ''}
             </div>
         `).join('');
     }
@@ -928,13 +931,68 @@ function clearAdminLogs() {
     }
 }
 // ==========================================
-// อัปเกรดระบบ: Auto Logout & เคลียร์สถานะเมื่อปิดหน้าต่าง/สลับแอป
+// อัปเกรดระบบ: Auto Logout (เก็บ Log) & ระบบแอดมินดีดผู้ใช้
 // ==========================================
+
+// 1. ฟังก์ชัน Logout เมื่อปิดหน้าต่าง (เพิ่มการเก็บ Log)
 function forceLogoutOnExit() {
     if (currentUser) {
+        logAction(currentUser, 'ปิดหน้าต่าง/แอป (Auto Logout)');
         updateSession(currentUser, false);
     }
 }
-
 window.addEventListener('beforeunload', forceLogoutOnExit);
 window.addEventListener('pagehide', forceLogoutOnExit);
+
+// 2. แอดมิน: ฟังก์ชันดีดผู้ใช้รายบุคคล
+function kickUser(userToKick) {
+    if(confirm(`ต้องการดีดครู ${userToKick} ออกจากระบบใช่หรือไม่?`)) {
+        updateSession(userToKick, false); // ถอดสถานะออนไลน์
+        logAction('admin', `แอดมินดีดผู้ใช้ "${userToKick}" ออกจากระบบ`);
+        renderAdminPanel(); // รีเฟรชหน้าจอแอดมิน
+        showToast(`ดีด ${userToKick} ออกจากระบบแล้ว`);
+    }
+}
+
+// 3. แอดมิน: ฟังก์ชันดีดทุกคน (ยกเว้น admin)
+function kickAllUsers() {
+    if(confirm(`⚠️ ยืนยันการดีดผู้ใช้งาน "ทุกคน" (ยกเว้น Admin) ออกจากระบบใช่หรือไม่?`)) {
+        let count = 0;
+        const currentSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+        
+        Object.keys(currentSessions).forEach(u => {
+            if(u !== 'admin') {
+                delete currentSessions[u];
+                count++;
+            }
+        });
+
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(currentSessions));
+        activeSessions = currentSessions; 
+        
+        logAction('admin', `แอดมินดีดผู้ใช้งานทั้งหมด (${count} คน) ออกจากระบบ`);
+        renderAdminPanel();
+        showToast(`ดีดผู้ใช้งาน ${count} คน สำเร็จ`);
+    }
+}
+
+// 4. ระบบตรวจจับ (ฝั่งผู้ใช้งาน): เช็คตัวเองทุกๆ 2 วินาทีว่าโดนดีดหรือยัง
+setInterval(() => {
+    if (currentUser && currentUser !== 'admin') { // ถ้าล็อกอินอยู่และไม่ใช่แอดมิน
+        const liveSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+        
+        // ถ้าชื่อตัวเองหายไปจากฐานข้อมูล แปลว่าโดนแอดมินเตะ
+        if (!liveSessions[currentUser]) {
+            alert('⚠️ คุณถูกผู้ดูแลระบบ (Admin) นำออกจากเซสชัน');
+            
+            // สั่ง Logout กระเด็นกลับหน้าแรกทันที
+            currentUser = null;
+            stopAutoLogoutTimer();
+            document.getElementById('dashboard-layout').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            if(adminUpdateInterval) clearInterval(adminUpdateInterval);
+        }
+    }
+}, 2000);
