@@ -9,9 +9,10 @@ let activeSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
 
 // --- State Management ---
 let currentUser = null;
+let currentSessionToken = null; // เพิ่มตัวแปรเก็บรหัสเครื่อง
 let originalCaseState = null; 
 let isSidebarOpen = true;
-let adminUpdateInterval = null; // Declare interval variable
+let adminUpdateInterval = null;
 
 // --- Config Data ---
 const prefixes = ['เด็กชาย', 'เด็กหญิง', 'นาย', 'นางสาว'];
@@ -199,10 +200,13 @@ function logAction(user, action) {
     localStorage.setItem(LOGS_KEY, JSON.stringify(systemLogs));
 }
 
-function updateSession(user, isActive) {
+function updateSession(user, isActive, token = null) {
     if(isActive) {
-        activeSessions[user] = new Date().toISOString();
+        // ถ้าระบุ token ให้ใช้ token (เพื่อกันล็อกอินซ้อน) ถ้าไม่ระบุให้ใช้วันที่
+        activeSessions[user] = token || new Date().toISOString();
     } else {
+        // ป้องกันเครื่องเก่าเผลอไปลบสถานะออนไลน์ของเครื่องใหม่ (ตอนปิดหน้าต่าง)
+        if (token && activeSessions[user] !== token) return; 
         delete activeSessions[user];
     }
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(activeSessions));
@@ -238,9 +242,14 @@ function resetAutoLogoutTimer() {
 function handleAutoLogout() {
     if (currentUser) {
         logAction(currentUser, 'หมดเวลาเชื่อมต่อ (Auto Logout)');
-        updateSession(currentUser, false);
         
+        // --- ส่วนที่แก้: คืนบัตรคิว (Token) ให้ระบบตอนออก ---
+        updateSession(currentUser, false, currentSessionToken); 
+        
+        // เคลียร์ค่าผู้ใช้และบัตรคิวทิ้ง
         currentUser = null;
+        currentSessionToken = null; 
+        
         stopAutoLogoutTimer();
         
         document.getElementById('dashboard-layout').classList.add('hidden');
@@ -329,8 +338,14 @@ function handleLogin(e) {
 
     if(pass === '1234' && user.trim() !== '') {
         currentUser = user;
+        
+        // --- ส่วนที่เพิ่มใหม่: สร้างบัตรคิว (Token) ประจำการล็อกอินครั้งนี้ ---
+        currentSessionToken = "token_" + Date.now(); 
+        
         logAction(user, 'เข้าสู่ระบบ (Login)');
-        updateSession(user, true);
+        
+        // --- ส่วนที่แก้: ส่งบัตรคิว (Token) ไปให้ระบบจำไว้ ---
+        updateSession(user, true, currentSessionToken); 
 
         document.getElementById('login-page').classList.add('hidden');
         document.getElementById('dashboard-layout').classList.remove('hidden');
@@ -355,9 +370,15 @@ function handleLogout() {
     if(confirm('ยืนยันการออกจากระบบ?')) {
         if(currentUser) {
             logAction(currentUser, 'ออกจากระบบ (Logout)');
-            updateSession(currentUser, false);
+            
+            // --- ส่วนที่แก้: คืนบัตรคิว (Token) ให้ระบบตอนออก ---
+            updateSession(currentUser, false, currentSessionToken); 
         }
+        
+        // เคลียร์ค่าผู้ใช้และบัตรคิวทิ้ง
         currentUser = null;
+        currentSessionToken = null; 
+        
         stopAutoLogoutTimer();
         document.getElementById('dashboard-layout').classList.add('hidden');
         document.getElementById('login-page').classList.remove('hidden');
@@ -931,14 +952,14 @@ function clearAdminLogs() {
     }
 }
 // ==========================================
-// อัปเกรดระบบ: Auto Logout (เก็บ Log) & ระบบแอดมินดีดผู้ใช้
+// อัปเกรดระบบ: Auto Logout (เก็บ Log) & ระบบแอดมินดีดผู้ใช้ & กันล็อกอินซ้อน
 // ==========================================
 
-// 1. ฟังก์ชัน Logout เมื่อปิดหน้าต่าง (เพิ่มการเก็บ Log)
+// 1. ฟังก์ชัน Logout เมื่อปิดหน้าต่าง (เพิ่มการเก็บ Log และส่ง Token)
 function forceLogoutOnExit() {
     if (currentUser) {
         logAction(currentUser, 'ปิดหน้าต่าง/แอป (Auto Logout)');
-        updateSession(currentUser, false);
+        updateSession(currentUser, false, currentSessionToken);
     }
 }
 window.addEventListener('beforeunload', forceLogoutOnExit);
@@ -947,9 +968,9 @@ window.addEventListener('pagehide', forceLogoutOnExit);
 // 2. แอดมิน: ฟังก์ชันดีดผู้ใช้รายบุคคล
 function kickUser(userToKick) {
     if(confirm(`ต้องการดีดครู ${userToKick} ออกจากระบบใช่หรือไม่?`)) {
-        updateSession(userToKick, false); // ถอดสถานะออนไลน์
+        updateSession(userToKick, false); // ไม่ใส่ token แปลว่าบังคับเตะ
         logAction('admin', `แอดมินดีดผู้ใช้ "${userToKick}" ออกจากระบบ`);
-        renderAdminPanel(); // รีเฟรชหน้าจอแอดมิน
+        renderAdminPanel(); 
         showToast(`ดีด ${userToKick} ออกจากระบบแล้ว`);
     }
 }
@@ -976,23 +997,32 @@ function kickAllUsers() {
     }
 }
 
-// 4. ระบบตรวจจับ (ฝั่งผู้ใช้งาน): เช็คตัวเองทุกๆ 2 วินาทีว่าโดนดีดหรือยัง
+// 4. ระบบตรวจจับ (ฝั่งผู้ใช้งาน): เช็คตัวเองทุกๆ 2 วินาที (ตรวจโดนเตะ & ตรวจล็อกอินซ้อน)
 setInterval(() => {
-    if (currentUser && currentUser !== 'admin') { // ถ้าล็อกอินอยู่และไม่ใช่แอดมิน
+    if (currentUser) { 
         const liveSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
-        
-        // ถ้าชื่อตัวเองหายไปจากฐานข้อมูล แปลว่าโดนแอดมินเตะ
-        if (!liveSessions[currentUser]) {
-            alert('⚠️ คุณถูกผู้ดูแลระบบ (Admin) นำออกจากเซสชัน');
-            
-            // สั่ง Logout กระเด็นกลับหน้าแรกทันที
-            currentUser = null;
-            stopAutoLogoutTimer();
-            document.getElementById('dashboard-layout').classList.add('hidden');
-            document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            if(adminUpdateInterval) clearInterval(adminUpdateInterval);
+        const activeToken = liveSessions[currentUser];
+
+        // กรณีที่ 1: โดนแอดมินดีดออก (ชื่อหายไปจากระบบ)
+        if (!activeToken && currentUser !== 'admin') {
+            forceKickOut('⚠️ คุณถูกผู้ดูแลระบบ (Admin) นำออกจากระบบ');
+        }
+        // กรณีที่ 2: ล็อกอินซ้อน (รหัส Token ไม่ตรงกับเครื่องปัจจุบัน)
+        else if (activeToken && activeToken !== currentSessionToken) {
+            forceKickOut('⚠️ มีการเข้าสู่ระบบบัญชีนี้จากอุปกรณ์อื่น เครื่องนี้จึงถูกบังคับออกจากระบบ');
         }
     }
 }, 2000);
+
+// ฟังก์ชันย่อยสำหรับเด้งกลับหน้า Login
+function forceKickOut(msg) {
+    alert(msg);
+    currentUser = null;
+    currentSessionToken = null;
+    stopAutoLogoutTimer();
+    document.getElementById('dashboard-layout').classList.add('hidden');
+    document.getElementById('login-page').classList.remove('hidden');
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    if(adminUpdateInterval) clearInterval(adminUpdateInterval);
+}
