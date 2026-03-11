@@ -928,19 +928,20 @@ function clearAdminLogs() {
     }
 }
 // ==========================================
-// ส่วนที่เพิ่มใหม่: Auto Logout เมื่อปิดหน้าต่าง
+// อัปเกรดระบบ: Auto Logout & เคลียร์สถานะเมื่อปิดหน้าต่าง/สลับแอป
 // ==========================================
 
-window.addEventListener('beforeunload', function () {
-    // ตรวจสอบว่าตอนนี้มีคนล็อกอินอยู่ไหม
+function forceLogoutOnExit() {
     if (currentUser) {
-        // 1. อัปเดตสถานะใน LocalStorage ว่า "ไม่ออนไลน์แล้ว"
-        // เพื่อให้หน้า Admin เห็นว่าคนนี้หลุดไปแล้ว
+        // เคลียร์สถานะออนไลน์ในฐานข้อมูล Admin ทันที
         updateSession(currentUser, false);
-        
-        // 2. (ทางเลือก) ถ้าต้องการให้เปิดมาใหม่แล้วต้องล็อกอินใหม่เสมอ
-        // ปกติ currentUser เป็นตัวแปรใน Ram มันหายไปเองอยู่แล้วเมื่อปิด tab
-        // แต่ถ้าอนาคตมีการเก็บ session ลง storage บรรทัดนี้จะช่วยเคลียร์ทิ้ง
-        sessionStorage.removeItem('currentUser');
+    }
+}
+
+// ดักจับตอนปิด Tab หรือปิด Browser (ใช้งานได้ดีบน PC)
+window.addEventListener('beforeunload', forceLogoutOnExit);
+
+// ดักจับตอนปิดแอป หรือสลับแอปบนมือถือ (ใช้งานได้ดีบน Mobile/Tablet)
+window.addEventListener('pagehide', forceLogoutOnExit);
     }
 });
