@@ -943,5 +943,4 @@ window.addEventListener('beforeunload', forceLogoutOnExit);
 
 // ดักจับตอนปิดแอป หรือสลับแอปบนมือถือ (ใช้งานได้ดีบน Mobile/Tablet)
 window.addEventListener('pagehide', forceLogoutOnExit);
-    }
 });
