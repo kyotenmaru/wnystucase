@@ -188,6 +188,9 @@ updateRealTime();
 
 // --- Logger ---
 function logAction(user, action) {
+    // 1. ดึงข้อมูลล่าสุดจากฐานข้อมูลเสมอก่อนบันทึก (แก้ปัญหาหน้าต่างเก่าเซฟทับหน้าต่างใหม่)
+    let freshLogs = JSON.parse(localStorage.getItem(LOGS_KEY)) || [];
+    
     const entry = {
         id: Date.now(),
         timestamp: new Date().toISOString(),
@@ -195,21 +198,29 @@ function logAction(user, action) {
         action: action,
         device: navigator.platform
     };
-    systemLogs.unshift(entry); 
-    if(systemLogs.length > 100) systemLogs.pop();
-    localStorage.setItem(LOGS_KEY, JSON.stringify(systemLogs));
+    
+    freshLogs.unshift(entry); 
+    if(freshLogs.length > 100) freshLogs.pop();
+    
+    // 2. อัปเดตกลับลงฐานข้อมูล
+    systemLogs = freshLogs; 
+    localStorage.setItem(LOGS_KEY, JSON.stringify(freshLogs));
 }
 
 function updateSession(user, isActive, token = null) {
+    // 1. ดึงข้อมูลล่าสุดจากฐานข้อมูลเสมอเช่นกัน
+    let freshSessions = JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+    
     if(isActive) {
-        // ถ้าระบุ token ให้ใช้ token (เพื่อกันล็อกอินซ้อน) ถ้าไม่ระบุให้ใช้วันที่
-        activeSessions[user] = token || new Date().toISOString();
+        freshSessions[user] = token || new Date().toISOString();
     } else {
-        // ป้องกันเครื่องเก่าเผลอไปลบสถานะออนไลน์ของเครื่องใหม่ (ตอนปิดหน้าต่าง)
-        if (token && activeSessions[user] !== token) return; 
-        delete activeSessions[user];
+        if (token && freshSessions[user] !== token) return; 
+        delete freshSessions[user];
     }
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(activeSessions));
+    
+    // 2. อัปเดตกลับลงฐานข้อมูล
+    activeSessions = freshSessions; 
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(freshSessions));
 }
 
 // --- Auto Logout System ---
